@@ -6,5 +6,7 @@ require __DIR__.'/vendor/autoload.php';
 use Symfony\Component\Console\Application;
 
 $app = new Application();
-echo "app loaded!";
+
+// register console commands
+
 $app->run();
