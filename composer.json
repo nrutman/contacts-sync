@@ -1,0 +1,16 @@
+{
+    "name": "nrutman/contacts-sync",
+    "description": "A Symfony console application to sync contacts from Planning Center to Google Groups",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Nate Rutman",
+            "email": "nathan.rutman@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.3",
+        "symfony/console": "^4.3",
+        "symfony/yaml": "^4.3"
+    }
+}
