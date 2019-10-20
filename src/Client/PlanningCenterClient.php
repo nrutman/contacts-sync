@@ -24,7 +24,7 @@ class PlanningCenterClient
     public function __construct(
         string $applicationId,
         string $applicationSecret,
-        WebClientFactory $webClientFactory
+        WebClientFactoryInterface $webClientFactory
     ){
         $this->applicationId = $applicationId;
         $this->applicationSecret = $applicationSecret;
@@ -71,8 +71,6 @@ class PlanningCenterClient
             );
         }, $data['data']);
 
-        print_r($contacts);
-
         return $contacts;
     }
 
@@ -82,7 +80,7 @@ class PlanningCenterClient
      * @param  array  $emailMap
      * @return string|null
      */
-    private static function getEmailFromPerson(array $person, array $emailMap): ?string
+    public static function getEmailFromPerson(array $person, array $emailMap): ?string
     {
         $list = $person['relationships']['emails'];
 
