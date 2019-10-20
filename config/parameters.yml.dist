@@ -1,0 +1,4 @@
+integrations:
+    planningCenter:
+        applicationId: "Enter your PlanningCenter application ID"
+        secret: "Enter your PlanningCenter application secret"
