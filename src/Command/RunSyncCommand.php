@@ -9,9 +9,9 @@ use Sync\Client\PlanningCenterClient;
 use Sync\Client\WebClientFactory;
 use Sync\Config\ConfigParser;
 
-class SyncToGoogleCommand extends Command
+class RunSyncCommand extends Command
 {
-    protected static $defaultName = 'sync:to-google';
+    protected static $defaultName = 'run';
 
     protected function configure()
     {

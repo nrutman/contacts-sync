@@ -4,11 +4,11 @@
 require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use Sync\Command\SyncToGoogleCommand;
+use Sync\Command\RunSyncCommand;
 
 $app = new Application();
 
 // register console commands
-$app->add(new SyncToGoogleCommand());
+$app->add(new RunSyncCommand());
 
 $app->run();
