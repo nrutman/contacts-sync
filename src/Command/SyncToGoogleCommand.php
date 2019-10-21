@@ -28,7 +28,10 @@ class SyncToGoogleCommand extends Command
             new WebClientFactory()
         );
 
-        $members = $planningCenterClient->getContacts('Member');
-        $regulars = $planningCenterClient->getContacts('Regular Attender');
+        $members = array_merge(
+            $planningCenterClient->getMembers(),
+            $planningCenterClient->getMembers('Regular Attender')
+        );
+        print_r($members);
     }
 }
