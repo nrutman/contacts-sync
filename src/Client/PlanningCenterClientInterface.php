@@ -2,6 +2,8 @@
 
 namespace Sync\Client;
 
+use Sync\Contact\Contact;
+
 interface PlanningCenterClientInterface
 {
     /**
@@ -9,7 +11,7 @@ interface PlanningCenterClientInterface
      *
      * @param string|null $membershipStatus [description]
      *
-     * @return Contacts[]
+     * @return Contact[]
      */
     public function getMembers(?string $membershipStatus = 'Member'): array;
 }

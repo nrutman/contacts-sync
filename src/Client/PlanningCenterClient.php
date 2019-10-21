@@ -3,6 +3,7 @@
 namespace Sync\Client;
 
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 use Sync\Contact\Contact;
 
 class PlanningCenterClient implements PlanningCenterClientInterface
@@ -19,7 +20,7 @@ class PlanningCenterClient implements PlanningCenterClientInterface
     /**
      * @param string $applicationId The application ID from Planning Center
      * @param string $applicationSecret The secret from PlanningCenter
-     * @param ClientInterface $webClient A Guzzle web client to use to make connections
+     * @param WebClientFactoryInterface $webClientFactory
      */
     public function __construct(
         string $applicationId,
@@ -100,6 +101,8 @@ class PlanningCenterClient implements PlanningCenterClientInterface
      * @param array $query
      *
      * @return Contact[]
+     *
+     * @throws GuzzleException
      */
     private function queryPeopleApi(array $query): array
     {
