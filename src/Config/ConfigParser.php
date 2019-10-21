@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 class ConfigParser
 {
     /**
-     * Returns application configuration object as an array
+     * Returns application configuration object as an array.
      *
      * @return array
      */
