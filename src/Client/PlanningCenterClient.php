@@ -5,6 +5,7 @@ namespace Sync\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Sync\Contact\Contact;
+use function GuzzleHttp\Psr7\parse_query;
 
 class PlanningCenterClient implements PlanningCenterClientInterface
 {
@@ -43,6 +44,7 @@ class PlanningCenterClient implements PlanningCenterClientInterface
         $query = [
             'include' => 'emails',
             'where[child]' => false,
+            'where[status]' => 'active',
         ];
 
         if ($membershipStatus !== null) {
@@ -106,23 +108,35 @@ class PlanningCenterClient implements PlanningCenterClientInterface
      */
     private function queryPeopleApi(array $query): array
     {
-        // TODO Add pagination!
-        $response = $this->webClient->request('GET', '/people/v2/people', [
-            'query' => $query,
-        ]);
+        $contacts = [];
 
-        $data = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        do {
+            $response = $this->webClient->request('GET', '/people/v2/people', [
+                'query' => $query,
+            ]);
 
-        $emailMap = self::createEmailMap($data['included']);
+            $data = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
 
-        $contacts = array_map(function ($person) use ($emailMap) {
-            return new Contact(
-                $person['attributes']['first_name'],
-                $person['attributes']['last_name'],
-                self::getEmailFromPerson($person, $emailMap)
-            );
-        }, $data['data']);
+            $emailMap = self::createEmailMap($data['included']);
+
+            array_walk($data['data'], static function ($person) use ($emailMap, &$contacts) {
+                $contacts[] = new Contact(
+                    $person['attributes']['first_name'],
+                    $person['attributes']['last_name'],
+                    self::getEmailFromPerson($person, $emailMap)
+                );
+            });
+        } while (
+            // if a NEXT link exists, we want to parse the next query from it...otherwise we assign a blank array and
+            // then check against that blank array to exit the loop (to maintain the array type of $query)
+            ($query = isset($data['links']['next']) ? self::getQueryFromUrl($data['links']['next']) : []) !== []
+        );
 
         return $contacts;
+    }
+
+    private static function getQueryFromUrl(string $url): array
+    {
+        return parse_query(parse_url($url, PHP_URL_QUERY));
     }
 }
