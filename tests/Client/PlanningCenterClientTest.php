@@ -49,27 +49,6 @@ class PlanningCenterClientTest extends MockeryTestCase
         );
     }
 
-    public function test_getEmailFromPerson()
-    {
-        $personMock = [
-            'relationships' => [
-                'emails' => [
-                    'data' => [
-                        0 => [
-                            'id' => self::EMAIL_ID,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $emailMapMock = [self::EMAIL_ID => self::EMAIL];
-
-        $result = $this->target->getEmailFromPerson($personMock, $emailMapMock);
-
-        $this->assertEquals(self::EMAIL, $result);
-    }
-
     public function test_getMembers()
     {
         $this->webHandler->append(

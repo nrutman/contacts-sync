@@ -58,7 +58,7 @@ class PlanningCenterClient
      * @param  array $emails
      * @return array
      */
-    public static function createEmailMap(array $emails): array
+    private static function createEmailMap(array $emails): array
     {
         $map = [];
 
@@ -77,7 +77,7 @@ class PlanningCenterClient
      * @param  array  $emailMap
      * @return string|null
      */
-    public static function getEmailFromPerson(array $person, array $emailMap): ?string
+    private static function getEmailFromPerson(array $person, array $emailMap): ?string
     {
         $list = $person['relationships']['emails'];
 
