@@ -11,9 +11,19 @@
     "require": {
         "guzzlehttp/guzzle": "^6.3",
         "symfony/console": "^4.3",
-        "symfony/yaml": "^4.3"
+        "symfony/yaml": "^4.3",
+        "phpunit/phpunit": "^8.4"
     },
     "autoload": {
-        "psr-4": {"Sync\\": "src/"}
+        "psr-4": {
+            "Sync\\": "src/",
+            "SyncTest\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit -c ."
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.2"
     }
 }
