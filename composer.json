@@ -10,9 +10,9 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.3",
+        "phpunit/phpunit": "^8.4",
         "symfony/console": "^4.3",
-        "symfony/yaml": "^4.3",
-        "phpunit/phpunit": "^8.4"
+        "symfony/yaml": "^4.3"
     },
     "autoload": {
         "psr-4": {
@@ -21,9 +21,13 @@
         }
     },
     "scripts": {
+        "cs": "php-cs-fixer fix --config=.php_cs.dist -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix --config=.php_cs.dist -v --diff",
         "test": "phpunit -c ."
     },
     "require-dev": {
-        "mockery/mockery": "^1.2"
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "mockery/mockery": "^1.2",
+        "roave/security-advisories": "dev-master"
     }
 }

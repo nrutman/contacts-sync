@@ -1,3 +1,12 @@
-/vendor
-.phpunit.result.cache
+# Application configuration
 /config/parameters.yml
+
+# Composer dependencies
+/vendor
+
+# Utility caches
+.phpunit.result.cache
+.php_cs.cache
+
+# Editor settings
+/.idea
