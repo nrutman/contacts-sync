@@ -39,7 +39,7 @@ class PlanningCenterClient
      * @param  [type] $membershipStatus [description]
      * @return Contacts[]
      */
-    public function getContacts(?string $membershipStatus = null): array
+    public function getMembers(?string $membershipStatus = 'Member'): array
     {
         $query = [
             'include' => 'emails',
@@ -50,28 +50,25 @@ class PlanningCenterClient
             $query['where[membership]'] = $membershipStatus;
         };
 
-        $response = $this->webClient->request('GET', '/people/v2/people', [
-            'query' => $query,
-        ]);
+        return $this->queryPeopleApi($query);
+    }
 
-        $data = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+    /**
+     * Returns a mapping of email IDs to email addresses
+     * @param  array $emails
+     * @return array
+     */
+    public static function createEmailMap(array $emails): array
+    {
+        $map = [];
 
-        $emailMap = [];
-        foreach($data['included'] as $include) {
-            if ($include['type'] === 'Email') {
-                $emailMap[$include['id']] = $include['attributes']['address'];
+        foreach($emails as $email) {
+            if ($email['type'] === 'Email') {
+                $map[$email['id']] = $email['attributes']['address'];
             }
         }
 
-        $contacts = array_map(function ($person) use ($emailMap) {
-            return new Contact(
-                $person['attributes']['first_name'],
-                $person['attributes']['last_name'],
-                self::getEmailFromPerson($person, $emailMap)
-            );
-        }, $data['data']);
-
-        return $contacts;
+        return $map;
     }
 
     /**
@@ -91,6 +88,34 @@ class PlanningCenterClient
         $emailId = $list['data'][0]['id'];
 
         return $emailMap[$emailId];
+    }
+
+    /**
+     * Queries the Planning Center People API based on the query provided
+     * @see https://developer.planning.center/docs/#/apps/people/2019-01-14/vertices/person
+     * @param  array $query
+     * @return Contact[]
+     */
+    private function queryPeopleApi(array $query): array
+    {
+        // TODO Add pagination!
+        $response = $this->webClient->request('GET', '/people/v2/people', [
+            'query' => $query,
+        ]);
+
+        $data = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+
+        $emailMap = self::createEmailMap($data['included']);
+
+        $contacts = array_map(function ($person) use ($emailMap) {
+            return new Contact(
+                $person['attributes']['first_name'],
+                $person['attributes']['last_name'],
+                self::getEmailFromPerson($person, $emailMap)
+            );
+        }, $data['data']);
+
+        return $contacts;
     }
 
 }
