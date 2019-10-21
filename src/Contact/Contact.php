@@ -4,18 +4,18 @@ namespace Sync\Contact;
 
 class Contact
 {
-    /** @var string **/
+    /** @var string * */
     public $firstName;
 
-    /** @var string **/
+    /** @var string * */
     public $lastName;
 
-    /** @var string|null **/
+    /** @var string|null * */
     public $email;
 
     /**
-     * @param string      $firstName
-     * @param string      $lastName
+     * @param string $firstName
+     * @param string $lastName
      * @param string|null $email
      */
     public function __construct(string $firstName, string $lastName, ?string $email = null)
