@@ -4,8 +4,9 @@ namespace Sync\Client;
 
 use GuzzleHttp\ClientInterface;
 use Sync\Contact\Contact;
+use Sync\Client\PlanningCenterClientInterface;
 
-class PlanningCenterClient
+class PlanningCenterClient implements PlanningCenterClientInterface
 {
     /** @var string **/
     protected $applicationId;
@@ -35,9 +36,7 @@ class PlanningCenterClient
     }
 
     /**
-     * Returns a list of contacts from the Planning Center API
-     * @param  [type] $membershipStatus [description]
-     * @return Contacts[]
+     * {@inheritdoc}
      */
     public function getMembers(?string $membershipStatus = 'Member'): array
     {
