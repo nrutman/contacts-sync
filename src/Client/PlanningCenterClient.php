@@ -4,29 +4,28 @@ namespace Sync\Client;
 
 use GuzzleHttp\ClientInterface;
 use Sync\Contact\Contact;
-use Sync\Client\PlanningCenterClientInterface;
 
 class PlanningCenterClient implements PlanningCenterClientInterface
 {
-    /** @var string **/
+    /** @var string * */
     protected $applicationId;
 
-    /** @var string **/
+    /** @var string * */
     protected $applicationSecret;
 
-    /** @var ClientInterface **/
+    /** @var ClientInterface * */
     protected $webClient;
 
     /**
-     * @param string          $applicationId     The application ID from Planning Center
-     * @param string          $applicationSecret The secret from PlanningCenter
-     * @param ClientInterface $webClient         A Guzzle web client to use to make connections
+     * @param string $applicationId The application ID from Planning Center
+     * @param string $applicationSecret The secret from PlanningCenter
+     * @param ClientInterface $webClient A Guzzle web client to use to make connections
      */
     public function __construct(
         string $applicationId,
         string $applicationSecret,
         WebClientFactoryInterface $webClientFactory
-    ){
+    ) {
         $this->applicationId = $applicationId;
         $this->applicationSecret = $applicationSecret;
         $this->webClient = $webClientFactory->create([
@@ -47,21 +46,23 @@ class PlanningCenterClient implements PlanningCenterClientInterface
 
         if ($membershipStatus !== null) {
             $query['where[membership]'] = $membershipStatus;
-        };
+        }
 
         return $this->queryPeopleApi($query);
     }
 
     /**
-     * Returns a mapping of email IDs to email addresses
-     * @param  array $emails
+     * Returns a mapping of email IDs to email addresses.
+     *
+     * @param array $emails
+     *
      * @return array
      */
     private static function createEmailMap(array $emails): array
     {
         $map = [];
 
-        foreach($emails as $email) {
+        foreach ($emails as $email) {
             if ($email['type'] === 'Email') {
                 $map[$email['id']] = $email['attributes']['address'];
             }
@@ -71,9 +72,11 @@ class PlanningCenterClient implements PlanningCenterClientInterface
     }
 
     /**
-     * Returns an email from a Person array via API response
-     * @param  array  $person
-     * @param  array  $emailMap
+     * Returns an email from a Person array via API response.
+     *
+     * @param array $person
+     * @param array $emailMap
+     *
      * @return string|null
      */
     private static function getEmailFromPerson(array $person, array $emailMap): ?string
@@ -90,9 +93,12 @@ class PlanningCenterClient implements PlanningCenterClientInterface
     }
 
     /**
-     * Queries the Planning Center People API based on the query provided
+     * Queries the Planning Center People API based on the query provided.
+     *
      * @see https://developer.planning.center/docs/#/apps/people/2019-01-14/vertices/person
-     * @param  array $query
+     *
+     * @param array $query
+     *
      * @return Contact[]
      */
     private function queryPeopleApi(array $query): array
@@ -116,5 +122,4 @@ class PlanningCenterClient implements PlanningCenterClientInterface
 
         return $contacts;
     }
-
 }
