@@ -2,15 +2,15 @@
 
 namespace SyncTest\Client;
 
-use Mockery\Adapter\Phpunit\MockeryTestCase;
-use Mockery as m;
-use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
+use Psr\Http\Message\RequestInterface;
 use Sync\Client\PlanningCenterClient;
 use Sync\Client\WebClientFactory;
+use Sync\Client\WebClientFactoryInterface;
 use Sync\Contact\Contact;
 
 class PlanningCenterClientTest extends MockeryTestCase
@@ -22,6 +22,11 @@ class PlanningCenterClientTest extends MockeryTestCase
     private const PERSON_ID = 2;
     private const PERSON_FIRST = 'Joe';
     private const PERSON_LAST = 'Smith';
+    private const PERSON_MEMBERSHIP = 'Member';
+    private const PERSON_GENDER = 'M';
+    private const PERSON_CREATED = '2016-02-19T02:00:00Z';
+    private const PERSON_UPDATED = '2017-03-19T03:30:00Z';
+    private const DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
     /** @var WebClientFactoryInterface **/
     private $webClientFactory;
@@ -49,7 +54,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         );
     }
 
-    public function test_getMembers()
+    public function test_getContacts()
     {
         $this->webHandler->append(
             new Response(200, [], \GuzzleHttp\json_encode([
@@ -61,10 +66,14 @@ class PlanningCenterClientTest extends MockeryTestCase
                     ],
                 ]],
                 'data' => [[
-                    'id' => 456,
+                    'id' => self::PERSON_ID,
                     'attributes' => [
                         'first_name' => self::PERSON_FIRST,
                         'last_name' => self::PERSON_LAST,
+                        'membership' => self::PERSON_MEMBERSHIP,
+                        'gender' => self::PERSON_GENDER,
+                        'created_at' => self::PERSON_CREATED,
+                        'updated_at' => self::PERSON_UPDATED,
                     ],
                     'relationships' => [
                         'emails' => [
@@ -77,7 +86,7 @@ class PlanningCenterClientTest extends MockeryTestCase
             ]))
         );
 
-        $result = $this->target->getMembers();
+        $result = $this->target->getContacts();
 
         $this->assertCount(1, $result);
 
@@ -87,12 +96,14 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->assertEquals(self::PERSON_FIRST, $contact->firstName);
         $this->assertEquals(self::PERSON_LAST, $contact->lastName);
         $this->assertEquals(self::EMAIL, $contact->email);
+        $this->assertEquals(self::PERSON_CREATED, $contact->createdAt->format(self::DATE_FORMAT));
+        $this->assertEquals(self::PERSON_UPDATED, $contact->updatedAt->format(self::DATE_FORMAT));
 
         /** @var RequestInterface $request **/
         $request = $this->webHistory[0]['request'];
 
         $this->assertEquals('api.planningcenteronline.com', $request->getUri()->getHost());
         $this->assertEquals('/people/v2/people', $request->getUri()->getPath());
-        $this->assertEquals('include=emails&where[child]=0&where[membership]=Member', urldecode($request->getUri()->getQuery()));
+        $this->assertEquals('include=emails&where[child]=0&where[status]=active', urldecode($request->getUri()->getQuery()));
     }
 }

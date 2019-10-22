@@ -7,7 +7,7 @@ use GuzzleHttp\ClientInterface;
 
 class WebClientFactory implements WebClientFactoryInterface
 {
-    /** @var array * */
+    /** @var array */
     protected $defaultConfiguration = [];
 
     /**

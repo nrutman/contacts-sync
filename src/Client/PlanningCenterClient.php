@@ -2,6 +2,7 @@
 
 namespace Sync\Client;
 
+use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Sync\Contact\Contact;
@@ -9,13 +10,13 @@ use function GuzzleHttp\Psr7\parse_query;
 
 class PlanningCenterClient implements PlanningCenterClientInterface
 {
-    /** @var string * */
+    /** @var string */
     protected $applicationId;
 
-    /** @var string * */
+    /** @var string */
     protected $applicationSecret;
 
-    /** @var ClientInterface * */
+    /** @var ClientInterface */
     protected $webClient;
 
     /**
@@ -38,18 +39,16 @@ class PlanningCenterClient implements PlanningCenterClientInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws GuzzleException
      */
-    public function getMembers(?string $membershipStatus = 'Member'): array
+    public function getContacts(): array
     {
         $query = [
             'include' => 'emails',
             'where[child]' => false,
             'where[status]' => 'active',
         ];
-
-        if ($membershipStatus !== null) {
-            $query['where[membership]'] = $membershipStatus;
-        }
 
         return $this->queryPeopleApi($query);
     }
@@ -123,7 +122,11 @@ class PlanningCenterClient implements PlanningCenterClientInterface
                 $contacts[] = new Contact(
                     $person['attributes']['first_name'],
                     $person['attributes']['last_name'],
-                    self::getEmailFromPerson($person, $emailMap)
+                    self::getEmailFromPerson($person, $emailMap),
+                    $person['attributes']['membership'],
+                    $person['attributes']['gender'],
+                    new Carbon($person['attributes']['created_at']),
+                    new Carbon($person['attributes']['updated_at'])
                 );
             });
         } while (
