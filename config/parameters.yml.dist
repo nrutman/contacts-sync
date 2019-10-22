@@ -1,4 +1,6 @@
 integrations:
     planningCenter:
-        applicationId: "Enter your PlanningCenter application ID"
-        secret: "Enter your PlanningCenter application secret"
+        x-instructions: "To complete this section you'll need a personal access token from https://api.planningcenteronline.com/oauth/applications"
+        authentication:
+            applicationId: "{{PlanningCenter Application ID}}"
+            secret: "{{PlanningCenter Secret}}"

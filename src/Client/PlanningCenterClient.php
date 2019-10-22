@@ -10,29 +10,26 @@ use function GuzzleHttp\Psr7\parse_query;
 
 class PlanningCenterClient implements PlanningCenterClientInterface
 {
-    /** @var string */
-    protected $applicationId;
-
-    /** @var string */
-    protected $applicationSecret;
+    /** @var array */
+    protected $configuration;
 
     /** @var ClientInterface */
     protected $webClient;
 
     /**
-     * @param string $applicationId The application ID from Planning Center
-     * @param string $applicationSecret The secret from PlanningCenter
+     * @param array $planningCenterConfiguration
      * @param WebClientFactoryInterface $webClientFactory
      */
     public function __construct(
-        string $applicationId,
-        string $applicationSecret,
+        array $planningCenterConfiguration,
         WebClientFactoryInterface $webClientFactory
     ) {
-        $this->applicationId = $applicationId;
-        $this->applicationSecret = $applicationSecret;
+        $this->configuration = $planningCenterConfiguration;
         $this->webClient = $webClientFactory->create([
-            'auth' => [$this->applicationId, $this->applicationSecret],
+            'auth' => [
+                $planningCenterConfiguration['authentication']['application_id'],
+                $planningCenterConfiguration['authentication']['secret'],
+            ],
             'base_uri' => 'https://api.planningcenteronline.com',
         ]);
     }

@@ -31,8 +31,7 @@ class RunSyncCommand extends Command
         $config = ConfigParser::getConfiguration();
 
         $planningCenterClient = new PlanningCenterClient(
-            $config['integrations']['planningCenter']['applicationId'],
-            $config['integrations']['planningCenter']['secret'],
+            $config['integrations']['planning_center'],
             new WebClientFactory()
         );
 

@@ -28,16 +28,16 @@ class PlanningCenterClientTest extends MockeryTestCase
     private const PERSON_UPDATED = '2017-03-19T03:30:00Z';
     private const DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
-    /** @var WebClientFactoryInterface **/
+    /** @var WebClientFactoryInterface */
     private $webClientFactory;
 
-    /** @var MockHandler **/
+    /** @var MockHandler */
     private $webHandler;
 
-    /** @var array **/
+    /** @var array */
     private $webHistory = [];
 
-    /** @var PlanningCenterClient **/
+    /** @var PlanningCenterClient */
     private $target;
 
     public function setUp(): void
@@ -48,8 +48,12 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->webClientFactory = new WebClientFactory(['handler' => $stack]);
 
         $this->target = new PlanningCenterClient(
-            self::APP_ID,
-            self::APP_SECRET,
+            [
+                'authentication' => [
+                    'application_id' => self::APP_ID,
+                    'secret' => self::APP_SECRET,
+                ],
+            ],
             $this->webClientFactory
         );
     }
@@ -90,7 +94,7 @@ class PlanningCenterClientTest extends MockeryTestCase
 
         $this->assertCount(1, $result);
 
-        /** @var Contact $contact **/
+        /** @var Contact $contact */
         $contact = $result[0];
 
         $this->assertEquals(self::PERSON_FIRST, $contact->firstName);
@@ -99,7 +103,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->assertEquals(self::PERSON_CREATED, $contact->createdAt->format(self::DATE_FORMAT));
         $this->assertEquals(self::PERSON_UPDATED, $contact->updatedAt->format(self::DATE_FORMAT));
 
-        /** @var RequestInterface $request **/
+        /** @var RequestInterface $request */
         $request = $this->webHistory[0]['request'];
 
         $this->assertEquals('api.planningcenteronline.com', $request->getUri()->getHost());
