@@ -119,10 +119,16 @@ class PlanningCenterClient implements PlanningCenterClientInterface
             $emailMap = self::createEmailMap($data['included']);
 
             array_walk($data['data'], static function ($person) use ($emailMap, &$contacts) {
+                $email = self::getEmailFromPerson($person, $emailMap);
+
+                if (!$email) {
+                    return;
+                }
+
                 $contacts[] = new Contact(
                     $person['attributes']['first_name'],
                     $person['attributes']['last_name'],
-                    self::getEmailFromPerson($person, $emailMap),
+                    $email,
                     $person['attributes']['membership'],
                     $person['attributes']['gender'],
                     new Carbon($person['attributes']['created_at']),

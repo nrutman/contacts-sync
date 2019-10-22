@@ -30,7 +30,7 @@ class Contact
     /**
      * @param string $firstName
      * @param string $lastName
-     * @param string|null $email
+     * @param string $email
      * @param string|null $membership
      * @param string|null $gender
      * @param DateTime $createdAt
@@ -39,7 +39,7 @@ class Contact
     public function __construct(
         string $firstName,
         string $lastName,
-        ?string $email,
+        string $email,
         ?string $membership,
         ?string $gender,
         DateTime $createdAt,
