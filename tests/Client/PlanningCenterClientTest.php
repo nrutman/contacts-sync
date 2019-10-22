@@ -58,7 +58,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         );
     }
 
-    public function test_getContacts()
+    public function test_getContacts(): void
     {
         $this->webHandler->append(
             new Response(200, [], \GuzzleHttp\json_encode([
