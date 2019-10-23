@@ -12,5 +12,4 @@ interface GoogleClientInterface
      * @return Google_Service_Directory_Member[]
      */
     public function getGroupMembers(string $groupId): array;
-
 }
