@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Sync\Client\GoogleClient;
+use Sync\Client\GoogleServiceFactory;
 use Sync\Client\PlanningCenterClient;
 use Sync\Client\WebClientFactory;
 use Sync\Config\ConfigParser;
@@ -41,7 +42,8 @@ class RunSyncCommand extends Command
         $googleClient = new GoogleClient(
             new Google_Client(),
             $config['integrations']['google'],
-            dirname(sprintf('%s/../../%s/1', __DIR__, $config['temp']['path']))
+            dirname(sprintf('%s/../../%s/1', __DIR__, $config['temp']['path'])),
+            new GoogleServiceFactory()
         );
 
         $this->log('Retrieving contacts from Planning Center...');
