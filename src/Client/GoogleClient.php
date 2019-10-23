@@ -24,17 +24,19 @@ class GoogleClient implements GoogleClientInterface
      * @param Google_Client $client
      * @param array $googleConfiguration
      * @param string $tempPath
+     * @param GoogleServiceFactory $googleServiceFactory
      *
      * @throws Google_Exception
      */
     public function __construct(
         Google_Client $client,
         array $googleConfiguration,
-        string $tempPath
+        string $tempPath,
+        GoogleServiceFactory $googleServiceFactory
     ) {
         $this->client = self::initializeClient($client, $googleConfiguration['authentication'], $tempPath);
         $this->configuration = $googleConfiguration;
-        $this->service = new Google_Service_Directory($this->client);
+        $this->service = $googleServiceFactory->create($this->client);
     }
 
     /**
