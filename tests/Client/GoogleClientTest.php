@@ -23,10 +23,17 @@ class GoogleClientTest extends MockeryTestCase
 
         $this->client = m::mock(Google_Client::class);
 
+        // setup expectations on client from initialize()
+
         $this->target = new GoogleClient(
             $this->client,
             $googleConfiguration,
             self::TEMP_PATH
         );
+    }
+
+    public function test_getGroupMembers(): void
+    {
+        
     }
 }
