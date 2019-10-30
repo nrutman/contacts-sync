@@ -46,56 +46,30 @@ class RunSyncCommand extends Command
             new GoogleServiceFactory()
         );
 
+        $lists = $config['lists'];
+        $listContacts = [];
+
         $this->log('Retrieving lists from Planning Center...');
 
-        $this->io->progressStart(3);
-        $church = $planningCenterClient->getContactsForList('church@provchurch.org');
-        $this->io->progressAdvance();
-        $men = $planningCenterClient->getContactsForList('men@provchurch.org');
-        $this->io->progressAdvance();
-        $women = $planningCenterClient->getContactsForList('women@provchurch.org');
+        $this->io->progressStart(count($lists));
+        foreach ($lists as $list) {
+            $listContacts[$list] = $planningCenterClient->getContactsForList($list);
+            $this->io->progressAdvance();
+        }
         $this->io->progressFinish();
 
         $this->log('Done!');
 
         $this->io->table([
-            'Type',
-            'Count',
-        ], [
-            ['Members & Regular Attenders', count($church)],
-            ['Men', count($men)],
-            ['Women', count($women)],
-        ]);
+            'List',
+            'Contacts',
+        ], array_map(static function ($contacts, $listName) {
+            return [$listName, count($contacts)];
+        }, $listContacts, array_keys($listContacts)));
 
-        /*
-         * Members & Regular Attenders
-         */
-
-        $this->syncContactsToGoogleGroup(
-            $googleClient,
-            'church@provchurch.org',
-            $church
-        );
-
-        /*
-         * Men's Group
-         */
-
-        $this->syncContactsToGoogleGroup(
-            $googleClient,
-            'men@provchurch.org',
-            $men
-        );
-
-        /*
-         * Women's Group
-         */
-
-        $this->syncContactsToGoogleGroup(
-            $googleClient,
-            'women@provchurch.org',
-            $women
-        );
+        foreach ($listContacts as $listName => $contacts) {
+            $this->syncContactsToGoogleGroup($googleClient, $listName, $contacts, true);
+        }
     }
 
     /**
@@ -151,6 +125,11 @@ class RunSyncCommand extends Command
         }, $toRemove));
     }
 
+    /**
+     * Custom logging function that adds a timestamp.
+     *
+     * @param string $message
+     */
     private function log(string $message): void
     {
         $timestamp = (new Carbon())->format('H:i:s');

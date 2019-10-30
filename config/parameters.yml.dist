@@ -1,3 +1,4 @@
+# The following sections should be setup via a command
 integrations:
     planningCenter:
         x-instructions: "To complete this section you'll need a personal access token from https://api.planningcenteronline.com/oauth/applications"
@@ -18,6 +19,10 @@ integrations:
                     - "urn:ietf:wg:oauth:2.0:oob"
                     - "http://localhost"
         domain: "{{G Suite Domain}}"
+
+# Add lists to sync below (the names of the Planning Center Lists should match the email of the Google Group).
+lists:
+    - list1
 
 tmp:
     path: tmp/
