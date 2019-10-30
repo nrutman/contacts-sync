@@ -15,6 +15,7 @@ use Sync\Client\PlanningCenterClient;
 use Sync\Client\WebClientFactory;
 use Sync\Config\ConfigParser;
 use Sync\Contact\Contact;
+use Symfony\Component\Console\Input\InputOption;
 
 class RunSyncCommand extends Command
 {
@@ -27,6 +28,14 @@ class RunSyncCommand extends Command
     protected function configure(): void
     {
         $this->setDescription('Syncs contacts from PlanningCenter to Google Groups');
+        $this->setHelp('Fetches contacts from a PlanningCenter list and syncs its members to a Google Group of the same name.');
+
+        $this->addOption(
+            'dry-run',
+            'd',
+            InputOption::VALUE_NONE,
+            'Completes a dry run by showing output but without writing any data.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): void
@@ -68,7 +77,7 @@ class RunSyncCommand extends Command
         }, $listContacts, array_keys($listContacts)));
 
         foreach ($listContacts as $listName => $contacts) {
-            $this->syncContactsToGoogleGroup($googleClient, $listName, $contacts, true);
+            $this->syncContactsToGoogleGroup($googleClient, $listName, $contacts, $input->getOption('dry-run'));
         }
     }
 
@@ -84,7 +93,11 @@ class RunSyncCommand extends Command
         array $contacts,
         bool $isDryRun = false
     ): void {
-        $this->log(sprintf('<info>Sycning %s</info>', $groupId));
+        if ($isDryRun) {
+            $this->log(sprintf('<info>Syncing %s (dry run)</info>', $groupId));
+        } else {
+            $this->log(sprintf('<info>Syncing %s</info>', $groupId));
+        }
 
         $groupMembers = $client->getGroupMembers($groupId);
 
