@@ -51,6 +51,29 @@ class PlanningCenterClient implements PlanningCenterClientInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @throws GuzzleException
+     */
+    public function getContactsForList(string $listName): array
+    {
+        $response = $this->webClient->request('GET', '/people/v2/lists', [
+            'query' => [
+                'where[name]' => $listName,
+            ],
+        ]);
+
+        $lists = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        $list = array_filter($lists['data'], static function ($list) use ($listName) {
+            return preg_match(sprintf('/^%s$/i', $listName), $list['attributes']['name']);
+        });
+
+        return $this->queryPeopleApi([
+            'include' => 'emails',
+        ], sprintf('/people/v2/lists/%d/people', array_pop(array_reverse($list))['id']));
+    }
+
+    /**
      * Returns a mapping of email IDs to email addresses.
      *
      * @param array $emails
@@ -102,12 +125,12 @@ class PlanningCenterClient implements PlanningCenterClientInterface
      *
      * @throws GuzzleException
      */
-    private function queryPeopleApi(array $query): array
+    private function queryPeopleApi(array $query, string $url = '/people/v2/people'): array
     {
         $contacts = [];
 
         do {
-            $response = $this->webClient->request('GET', '/people/v2/people', [
+            $response = $this->webClient->request('GET', $url, [
                 'query' => $query,
             ]);
 

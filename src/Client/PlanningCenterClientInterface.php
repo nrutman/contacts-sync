@@ -12,4 +12,13 @@ interface PlanningCenterClientInterface
      * @return Contact[]
      */
     public function getContacts(): array;
+
+    /**
+     * Returns a list of contacts from a Planning Center list.
+     *
+     * @param string $listName
+     *
+     * @return Contact[]
+     */
+    public function getContactsForList(string $listName): array;
 }

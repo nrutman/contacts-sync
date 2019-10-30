@@ -46,29 +46,17 @@ class RunSyncCommand extends Command
             new GoogleServiceFactory()
         );
 
-        $this->log('Retrieving contacts from Planning Center...');
+        $this->log('Retrieving lists from Planning Center...');
 
-        $contacts = $planningCenterClient->getContacts();
+        $this->io->progressStart(3);
+        $church = $planningCenterClient->getContactsForList('church@provchurch.org');
+        $this->io->progressAdvance();
+        $men = $planningCenterClient->getContactsForList('men@provchurch.org');
+        $this->io->progressAdvance();
+        $women = $planningCenterClient->getContactsForList('women@provchurch.org');
+        $this->io->progressFinish();
 
         $this->log('Done!');
-
-        $church = [];
-        $men = [];
-        $women = [];
-
-        array_walk($contacts, static function (Contact $contact) use (&$church, &$men, &$women) {
-            if (!in_array($contact->membership, ['Member', 'Regular Attender'])) {
-                return;
-            }
-
-            $church[] = $contact;
-
-            if ($contact->gender === 'M') {
-                $men[] = $contact;
-            } elseif ($contact->gender === 'F') {
-                $women[] = $contact;
-            }
-        });
 
         $this->io->table([
             'Type',
@@ -129,12 +117,12 @@ class RunSyncCommand extends Command
         /** @var Contact[] $contactsMappedByEmail */
         $contactsMappedByEmail = [];
         foreach ($contacts as $contact) {
-            $contactsMappedByEmail[$contact->email] = $contact;
+            $contactsMappedByEmail[strtolower($contact->email)] = $contact;
         }
 
         $groupMembersMappedByEmail = [];
         foreach ($groupMembers as $member) {
-            $groupMembersMappedByEmail[$member->getEmail()] = $member;
+            $groupMembersMappedByEmail[strtolower($member->getEmail())] = $member;
         }
 
         /** @var Contact[] $toAdd */
@@ -144,12 +132,12 @@ class RunSyncCommand extends Command
 
         // Find any emails in the contact list that are not in the Google group. These should be added.
         array_push($toAdd, ...array_filter($contacts, static function (Contact $contact) use ($groupMembersMappedByEmail) {
-            return !isset($groupMembersMappedByEmail[$contact->email]);
+            return !isset($groupMembersMappedByEmail[strtolower($contact->email)]);
         }));
 
         // Find any Google group members that are not in the contact list. These should be removed.
         array_push($toRemove, ...array_filter($groupMembers, static function (Google_Service_Directory_Member $member) use ($contactsMappedByEmail) {
-            return !isset($contactsMappedByEmail[$member->getEmail()]);
+            return !isset($contactsMappedByEmail[strtolower($member->getEmail())]);
         }));
 
         $this->io->text(sprintf('Adding %d contacts...', count($toAdd)));
