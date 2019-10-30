@@ -1,6 +1,6 @@
 <?php
 
-namespace Sync\Contact;
+namespace App\Contact;
 
 use DateTime;
 

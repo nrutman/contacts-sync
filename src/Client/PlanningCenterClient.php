@@ -1,53 +1,35 @@
 <?php
 
-namespace Sync\Client;
+namespace App\Client;
 
 use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Sync\Contact\Contact;
+use App\Contact\Contact;
 use function GuzzleHttp\Psr7\parse_query;
 
-class PlanningCenterClient implements PlanningCenterClientInterface
+class PlanningCenterClient implements ReadableListClientInterface
 {
-    /** @var array */
-    protected $configuration;
-
     /** @var ClientInterface */
     protected $webClient;
 
     /**
-     * @param array $planningCenterConfiguration
+     * @param string $planningCenterAppId
+     * @param string $planningCenterAppSecret
      * @param WebClientFactoryInterface $webClientFactory
      */
     public function __construct(
-        array $planningCenterConfiguration,
+        string $planningCenterAppId,
+        string $planningCenterAppSecret,
         WebClientFactoryInterface $webClientFactory
     ) {
-        $this->configuration = $planningCenterConfiguration;
         $this->webClient = $webClientFactory->create([
             'auth' => [
-                $planningCenterConfiguration['authentication']['application_id'],
-                $planningCenterConfiguration['authentication']['secret'],
+                $planningCenterAppId,
+                $planningCenterAppSecret,
             ],
             'base_uri' => 'https://api.planningcenteronline.com',
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws GuzzleException
-     */
-    public function getContacts(): array
-    {
-        $query = [
-            'include' => 'emails',
-            'where[child]' => false,
-            'where[status]' => 'active',
-        ];
-
-        return $this->queryPeopleApi($query);
     }
 
     /**
@@ -70,7 +52,7 @@ class PlanningCenterClient implements PlanningCenterClientInterface
 
         return $this->queryPeopleApi([
             'include' => 'emails',
-        ], sprintf('/people/v2/lists/%d/people', array_pop(array_reverse($list))['id']));
+        ], sprintf('/people/v2/lists/%d/people', array_shift($list)['id']));
     }
 
     /**
@@ -164,6 +146,13 @@ class PlanningCenterClient implements PlanningCenterClientInterface
         return $contacts;
     }
 
+    /**
+     * Extracts a querystring array from a url string.
+     *
+     * @param string $url
+     *
+     * @return array
+     */
     private static function getQueryFromUrl(string $url): array
     {
         return parse_query(parse_url($url, PHP_URL_QUERY));

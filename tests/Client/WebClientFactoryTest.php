@@ -1,9 +1,9 @@
 <?php
 
-namespace SyncTest\Client;
+namespace App\Test\Client;
 
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use Sync\Client\WebClientFactory;
+use App\Client\WebClientFactory;
 use GuzzleHttp\ClientInterface;
 
 class WebClientFactoryTest extends MockeryTestCase

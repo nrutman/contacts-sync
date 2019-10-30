@@ -1,6 +1,6 @@
 <?php
 
-namespace SyncTest\Client;
+namespace App\Test\Client;
 
 use Google_Client;
 use Google_Service_Directory;
@@ -9,8 +9,8 @@ use Google_Service_Directory_Members;
 use Google_Service_Directory_Resource_Members;
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use Sync\Client\GoogleClient;
-use Sync\Client\GoogleServiceFactory;
+use App\Client\GoogleClient;
+use App\Client\GoogleServiceFactory;
 
 class GoogleClientTest extends MockeryTestCase
 {

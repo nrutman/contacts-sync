@@ -1,6 +1,6 @@
 <?php
 
-namespace SyncTest\Client;
+namespace App\Test\Client;
 
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -8,10 +8,10 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Psr\Http\Message\RequestInterface;
-use Sync\Client\PlanningCenterClient;
-use Sync\Client\WebClientFactory;
-use Sync\Client\WebClientFactoryInterface;
-use Sync\Contact\Contact;
+use App\Client\PlanningCenterClient;
+use App\Client\WebClientFactory;
+use App\Client\WebClientFactoryInterface;
+use App\Contact\Contact;
 
 class PlanningCenterClientTest extends MockeryTestCase
 {
@@ -19,7 +19,9 @@ class PlanningCenterClientTest extends MockeryTestCase
     private const APP_SECRET = 'secret';
     private const EMAIL = 'foo@bar';
     private const EMAIL_ID = 1;
-    private const PERSON_ID = 2;
+    private const LIST_ID = 2;
+    private const LIST_NAME = 'list@list.com';
+    private const PERSON_ID = 3;
     private const PERSON_FIRST = 'Joe';
     private const PERSON_LAST = 'Smith';
     private const PERSON_MEMBERSHIP = 'Member';
@@ -48,18 +50,26 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->webClientFactory = new WebClientFactory(['handler' => $stack]);
 
         $this->target = new PlanningCenterClient(
-            [
-                'authentication' => [
-                    'application_id' => self::APP_ID,
-                    'secret' => self::APP_SECRET,
-                ],
-            ],
+            self::APP_ID,
+            self::APP_SECRET,
             $this->webClientFactory
         );
     }
 
-    public function test_getContacts(): void
+    public function test_getContactsForList(): void
     {
+        // fetch for the list
+        $this->webHandler->append(
+            new Response(200, [], \GuzzleHttp\json_encode([
+                'data' => [[
+                    'id' => self::LIST_ID,
+                    'attributes' => [
+                        'name' => self::LIST_NAME
+                    ],
+                ]],
+            ]))
+        );
+        // fetch for the list's contacts
         $this->webHandler->append(
             new Response(200, [], \GuzzleHttp\json_encode([
                 'included' => [[
@@ -90,7 +100,7 @@ class PlanningCenterClientTest extends MockeryTestCase
             ]))
         );
 
-        $result = $this->target->getContacts();
+        $result = $this->target->getContactsForList(self::LIST_NAME);
 
         $this->assertCount(1, $result);
 
@@ -104,10 +114,12 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->assertEquals(self::PERSON_UPDATED, $contact->updatedAt->format(self::DATE_FORMAT));
 
         /** @var RequestInterface $request */
-        $request = $this->webHistory[0]['request'];
+        $listRequest = $this->webHistory[0]['request'];
+        $peopleRequest = $this->webHistory[1]['request'];
 
-        $this->assertEquals('api.planningcenteronline.com', $request->getUri()->getHost());
-        $this->assertEquals('/people/v2/people', $request->getUri()->getPath());
-        $this->assertEquals('include=emails&where[child]=0&where[status]=active', urldecode($request->getUri()->getQuery()));
+        $this->assertEquals('api.planningcenteronline.com', $peopleRequest->getUri()->getHost());
+        $this->assertEquals(sprintf('/people/v2/lists/%d/people', self::LIST_ID), $peopleRequest->getUri()->getPath());
+        $this->assertEquals('include=emails', urldecode($peopleRequest->getUri()->getQuery()));
+
     }
 }

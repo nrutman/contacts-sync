@@ -1,6 +1,6 @@
 <?php
 
-namespace Sync\Command;
+namespace App\Command;
 
 use Carbon\Carbon;
 use Google_Client;
@@ -9,18 +9,18 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Sync\Client\GoogleClient;
-use Sync\Client\GoogleServiceFactory;
-use Sync\Client\PlanningCenterClient;
-use Sync\Client\WebClientFactory;
-use Sync\Config\ConfigParser;
-use Sync\Contact\Contact;
+use App\Client\GoogleClient;
+use App\Client\GoogleServiceFactory;
+use App\Client\PlanningCenterClient;
+use App\Client\WebClientFactory;
+use App\Config\ConfigParser;
+use App\Contact\Contact;
 use Symfony\Component\Console\Input\InputOption;
 
 class RunSyncCommand extends Command
 {
     /** @var string */
-    protected static $defaultName = 'run';
+    protected static $defaultName = 'sync:run';
 
     /** @var SymfonyStyle */
     protected $io;
