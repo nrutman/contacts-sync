@@ -1,36 +1,80 @@
 {
-    "name": "nrutman/contacts-sync",
-    "description": "A Symfony console application to sync contacts from Planning Center to Google Groups",
     "type": "project",
+    "name": "nrutman/contacts-sync",
+    "description": "A Symfony application to sync contacts from Planning Center to Google Groups",
     "authors": [
         {
             "name": "Nate Rutman",
             "email": "nathan.rutman@gmail.com"
         }
     ],
+    "license": "proprietary",
     "require": {
-        "php": ">=7.2",
-        "guzzlehttp/guzzle": "^6.3",
-        "phpunit/phpunit": "^8.4",
-        "symfony/console": "^4.3",
-        "symfony/yaml": "^4.3",
+        "php": "^7.1.3",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "google/apiclient": "^2.4",
+        "guzzlehttp/guzzle": "^6.4",
         "nesbot/carbon": "^2.25",
-        "google/apiclient": "^2.4"
-    },
-    "autoload": {
-        "psr-4": {
-            "Sync\\": "src/",
-            "SyncTest\\": "tests/"
-        }
-    },
-    "scripts": {
-        "cs": "php-cs-fixer fix --config=.php_cs.dist -v --diff --dry-run",
-        "cs-fix": "php-cs-fixer fix --config=.php_cs.dist -v --diff",
-        "test": "phpunit -c ."
+        "symfony/console": "4.3.*",
+        "symfony/dotenv": "4.3.*",
+        "symfony/flex": "^1.3.1",
+        "symfony/framework-bundle": "4.3.*",
+        "symfony/monolog-bundle": "^3.4",
+        "symfony/test-pack": "^1.0",
+        "symfony/yaml": "4.3.*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",
         "mockery/mockery": "^1.2",
         "roave/security-advisories": "dev-master"
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "paragonie/random_compat": "2.*",
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php71": "*",
+        "symfony/polyfill-php70": "*",
+        "symfony/polyfill-php56": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "cs": "php-cs-fixer fix --config=.php_cs.dist -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix --config=.php_cs.dist -v --diff",
+        "test": "phpunit -c ."
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "4.3.*"
+        }
     }
 }

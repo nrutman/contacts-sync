@@ -1,24 +1,19 @@
 <?php
-/**
- * @see https://cs.symfony.com/
- */
-if (!file_exists(__DIR__.'/src')) {
-    exit(0);
-}
+
 $finder = PhpCsFixer\Finder::create()
-    ->in([
-        __DIR__.'/src',
-    ])
+    ->in(__DIR__)
+    ->exclude('var')
 ;
 
 return PhpCsFixer\Config::create()
-    ->setFinder($finder)
     ->setRiskyAllowed(false)
     ->setRules([
-        '@PSR2' => true,
         '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
+        '@PSR2' => true,
         'phpdoc_align' => ['align' => 'left'],
         'yoda_style' => null,
         'phpdoc_to_comment' => false,
-    ]);
+    ])
+    ->setFinder($finder)
+;
