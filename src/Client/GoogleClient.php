@@ -2,12 +2,13 @@
 
 namespace App\Client;
 
+use App\Contact\Contact;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Directory;
 use RuntimeException;
 
-class GoogleClient implements GoogleClientInterface
+class GoogleClient implements ReadableListClientInterface, WriteableListClientInterface
 {
     private const TOKEN_FILENAME = 'google-token.json';
 
@@ -22,31 +23,23 @@ class GoogleClient implements GoogleClientInterface
 
     /**
      * @param Google_Client $client
-     * @param array $googleConfiguration
-     * @param string $tempPath
      * @param GoogleServiceFactory $googleServiceFactory
+     * @param array $googleConfiguration
+     * @param string $googleDomain
+     * @param string $varPath
      *
      * @throws Google_Exception
      */
     public function __construct(
         Google_Client $client,
+        GoogleServiceFactory $googleServiceFactory,
         array $googleConfiguration,
-        string $tempPath,
-        GoogleServiceFactory $googleServiceFactory
+        string $googleDomain,
+        string $varPath
     ) {
-        $this->client = self::initializeClient($client, $googleConfiguration['authentication'], $tempPath);
+        $this->client = self::initializeClient($client, $googleConfiguration, $googleDomain, $varPath);
         $this->configuration = $googleConfiguration;
         $this->service = $googleServiceFactory->create($this->client);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGroupMembers(string $groupId): array
-    {
-        $members = $this->service->members->listMembers($groupId)->getMembers();
-
-        return (is_array($members)) ? $members : [$members];
     }
 
     /**
@@ -56,14 +49,14 @@ class GoogleClient implements GoogleClientInterface
      *
      * @param Google_Client $client
      * @param array $configuration
+     * @param string $domain
      * @param string $tempPath
      *
      * @return Google_Client
      *
      * @throws Google_Exception
-     * @throws RuntimeException
      */
-    protected static function initializeClient(Google_Client $client, array $configuration, string $tempPath): Google_Client
+    protected static function initializeClient(Google_Client $client, array $configuration, string $domain, string $tempPath): Google_Client
     {
         $client->setApplicationName('Contacts Sync');
         $client->setScopes([
@@ -73,6 +66,7 @@ class GoogleClient implements GoogleClientInterface
         $client->setAuthConfig($configuration);
         $client->setAccessType('offline');
         $client->setPrompt('select_account consent');
+        $client->setHostedDomain($domain);
 
         // Load previously authorized token from a file, if it exists.
         // The file token.json stores the user's access and refresh tokens, and is
@@ -110,5 +104,31 @@ class GoogleClient implements GoogleClientInterface
         }
 
         return $client;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContactsForList(string $listName): array
+    {
+        $members = $this->service->members->listMembers($listName)->getMembers();
+print_r($members); die();
+        return (is_array($members)) ? $members : [$members];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addContact(Contact $contact): void
+    {
+        // TODO: Implement addContact() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeContact(Contact $contact): void
+    {
+        // TODO: Implement removeContact() method.
     }
 }

@@ -7,7 +7,6 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use Psr\Http\Message\RequestInterface;
 use App\Client\PlanningCenterClient;
 use App\Client\WebClientFactory;
 use App\Client\WebClientFactoryInterface;
@@ -64,7 +63,7 @@ class PlanningCenterClientTest extends MockeryTestCase
                 'data' => [[
                     'id' => self::LIST_ID,
                     'attributes' => [
-                        'name' => self::LIST_NAME
+                        'name' => self::LIST_NAME,
                     ],
                 ]],
             ]))

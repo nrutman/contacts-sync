@@ -2,28 +2,37 @@
 
 namespace App\Command;
 
+use App\Client\GoogleClient;
+use App\Client\PlanningCenterClient;
+use App\Contact\Contact;
 use Carbon\Carbon;
-use Google_Client;
+use Exception;
 use Google_Service_Directory_Member;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Client\GoogleClient;
-use App\Client\GoogleServiceFactory;
-use App\Client\PlanningCenterClient;
-use App\Client\WebClientFactory;
-use App\Config\ConfigParser;
-use App\Contact\Contact;
-use Symfony\Component\Console\Input\InputOption;
 
 class RunSyncCommand extends Command
 {
-    /** @var string */
-    protected static $defaultName = 'sync:run';
+    /** @var GoogleClient */
+    protected $googleClient;
 
     /** @var SymfonyStyle */
     protected $io;
+
+    /** @var PlanningCenterClient */
+    protected $planningCenterClient;
+
+    public function __construct(
+        GoogleClient $googleClient,
+        PlanningCenterClient $planningCenterClient
+    ) {
+        $this->googleClient = $googleClient;
+        $this->planningCenterClient = $planningCenterClient;
+        parent::__construct('sync:run');
+    }
 
     protected function configure(): void
     {
@@ -41,28 +50,14 @@ class RunSyncCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new SymfonyStyle($input, $output);
-        $config = ConfigParser::getConfiguration();
 
-        $planningCenterClient = new PlanningCenterClient(
-            $config['integrations']['planning_center'],
-            new WebClientFactory()
-        );
-
-        $googleClient = new GoogleClient(
-            new Google_Client(),
-            $config['integrations']['google'],
-            dirname(sprintf('%s/../../%s/1', __DIR__, $config['temp']['path'])),
-            new GoogleServiceFactory()
-        );
-
-        $lists = $config['lists'];
         $listContacts = [];
 
         $this->log('Retrieving lists from Planning Center...');
 
         $this->io->progressStart(count($lists));
         foreach ($lists as $list) {
-            $listContacts[$list] = $planningCenterClient->getContactsForList($list);
+            $listContacts[$list] = $this->planningCenterClient->getContactsForList($list);
             $this->io->progressAdvance();
         }
         $this->io->progressFinish();
@@ -77,7 +72,7 @@ class RunSyncCommand extends Command
         }, $listContacts, array_keys($listContacts)));
 
         foreach ($listContacts as $listName => $contacts) {
-            $this->syncContactsToGoogleGroup($googleClient, $listName, $contacts, $input->getOption('dry-run'));
+            $this->syncContactsToGoogleGroup($this->googleClient, $listName, $contacts, $input->getOption('dry-run'));
         }
     }
 
@@ -86,6 +81,8 @@ class RunSyncCommand extends Command
      * @param string $groupId
      * @param Contact[] $contacts
      * @param bool $isDryRun
+     *
+     * @throws Exception
      */
     private function syncContactsToGoogleGroup(
         GoogleClient $client,
@@ -142,6 +139,8 @@ class RunSyncCommand extends Command
      * Custom logging function that adds a timestamp.
      *
      * @param string $message
+     *
+     * @throws Exception
      */
     private function log(string $message): void
     {

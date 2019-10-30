@@ -24,6 +24,3 @@ parameters:
     # Add lists to sync below (the names of the Planning Center Lists should match the email of the Google Group).
     lists:
         - list1
-
-    tmp:
-        path: tmp/
