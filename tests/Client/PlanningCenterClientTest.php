@@ -113,13 +113,6 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->assertEquals(self::PERSON_CREATED, $contact->createdAt->format(self::DATE_FORMAT));
         $this->assertEquals(self::PERSON_UPDATED, $contact->updatedAt->format(self::DATE_FORMAT));
 
-        /** @var RequestInterface $request */
-        $listRequest = $this->webHistory[0]['request'];
-        $peopleRequest = $this->webHistory[1]['request'];
-
-        $this->assertEquals('api.planningcenteronline.com', $peopleRequest->getUri()->getHost());
-        $this->assertEquals(sprintf('/people/v2/lists/%d/people', self::LIST_ID), $peopleRequest->getUri()->getPath());
-        $this->assertEquals('include=emails', urldecode($peopleRequest->getUri()->getQuery()));
-
+        $this->assertCount(2, $this->webHistory);
     }
 }
