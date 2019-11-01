@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Client;
+namespace App\Test\Client\Google;
 
 use Google_Client;
 use Google_Service_Directory;
@@ -9,8 +9,8 @@ use Google_Service_Directory_Members;
 use Google_Service_Directory_Resource_Members;
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use App\Client\GoogleClient;
-use App\Client\GoogleServiceFactory;
+use App\Client\Google\GoogleClient;
+use App\Client\Google\GoogleServiceFactory;
 
 class GoogleClientTest extends MockeryTestCase
 {

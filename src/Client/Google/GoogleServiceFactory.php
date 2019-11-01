@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Client;
+namespace App\Client\Google;
 
 use Google_Client;
 use Google_Service_Directory;

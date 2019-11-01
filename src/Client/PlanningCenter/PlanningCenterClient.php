@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Client;
+namespace App\Client\PlanningCenter;
 
+use App\Client\ReadableListClientInterface;
+use App\Client\WebClientFactoryInterface;
 use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;

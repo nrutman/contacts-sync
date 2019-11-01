@@ -2,8 +2,8 @@
 
 namespace App\Command;
 
-use App\Client\GoogleClient;
-use App\Client\PlanningCenterClient;
+use App\Client\Google\GoogleClient;
+use App\Client\PlanningCenter\PlanningCenterClient;
 use App\Contact\Contact;
 use Carbon\Carbon;
 use Exception;
@@ -96,7 +96,7 @@ class RunSyncCommand extends Command
             $this->log(sprintf('<info>Syncing %s</info>', $groupId));
         }
 
-        $groupMembers = $client->getGroupMembers($groupId);
+        $groupMembers = $client->getContactsForList($groupId);
 
         /** @var Contact[] $contactsMappedByEmail */
         $contactsMappedByEmail = [];

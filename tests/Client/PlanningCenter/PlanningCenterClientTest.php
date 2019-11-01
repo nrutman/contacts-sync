@@ -7,7 +7,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use App\Client\PlanningCenterClient;
+use App\Client\PlanningCenter\PlanningCenterClient;
 use App\Client\WebClientFactory;
 use App\Client\WebClientFactoryInterface;
 use App\Contact\Contact;

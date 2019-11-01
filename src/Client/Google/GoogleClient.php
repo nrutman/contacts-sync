@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Client;
+namespace App\Client\Google;
 
+use App\Client\ReadableListClientInterface;
+use App\Client\WriteableListClientInterface;
 use App\Contact\Contact;
 use Google_Client;
 use Google_Exception;
