@@ -17,6 +17,7 @@ class GoogleClientTest extends MockeryTestCase
     private const DOMAIN = 'domain';
     private const GOOGLE_AUTH = ['authorize_me'];
     private const GROUP_ID = 'group@domain';
+    private const MEMBER_EMAIL = 'foo@bar';
     private const TEMP_PATH = 'tmp/test';
 
     /** @var Google_Client|m\LegacyMockInterface|m\MockInterface */
@@ -55,32 +56,35 @@ class GoogleClientTest extends MockeryTestCase
             ->shouldReceive([
                 'isAccessTokenExpired' => false,
                 'getAccessToken' => 'foobar-token',
+                'setHostedDomain' => null,
             ]);
 
         $this->target = new GoogleClient(
             $this->client,
+            $this->serviceFactory,
             $googleConfiguration,
-            self::TEMP_PATH,
-            $this->serviceFactory
+            self::DOMAIN,
+            self::TEMP_PATH
         );
     }
 
-    public function test_getGroupMembers(): void
+    public function test_getContactsForList(): void
     {
-        $member = m::mock(Google_Service_Directory_Member::class);
+        $member = new Google_Service_Directory_Member();
+        $member->setEmail(self::MEMBER_EMAIL);
 
         $this->service->members = m::mock(Google_Service_Directory_Resource_Members::class);
         $this->service->members
             ->shouldReceive('listMembers')
             ->with(self::GROUP_ID)
             ->andReturn(m::mock(Google_Service_Directory_Members::class, [
-                'getMembers' => $member,
+                'getMembers' => [$member],
             ]));
 
-        $result = $this->target->getGroupMembers(self::GROUP_ID);
+        $result = $this->target->getContactsForList(self::GROUP_ID);
 
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
-        $this->assertEquals($member, $result[0]);
+        $this->assertEquals(self::MEMBER_EMAIL, $result[0]->email);
     }
 }

@@ -129,15 +129,11 @@ class PlanningCenterClient implements ReadableListClientInterface
                     return;
                 }
 
-                $contacts[] = new Contact(
-                    $person['attributes']['first_name'],
-                    $person['attributes']['last_name'],
-                    $email,
-                    $person['attributes']['membership'],
-                    $person['attributes']['gender'],
-                    new Carbon($person['attributes']['created_at']),
-                    new Carbon($person['attributes']['updated_at'])
-                );
+                $contact = new Contact();
+                $contact->firstName = $person['attributes']['first_name'];
+                $contact->lastName = $person['attributes']['last_name'];
+                $contact->email = $email;
+                $contacts[] = $contact;
             });
         } while (
             // if a NEXT link exists, we want to parse the next query from it...otherwise we assign a blank array and

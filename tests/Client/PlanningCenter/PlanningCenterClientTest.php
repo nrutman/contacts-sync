@@ -23,11 +23,6 @@ class PlanningCenterClientTest extends MockeryTestCase
     private const PERSON_ID = 3;
     private const PERSON_FIRST = 'Joe';
     private const PERSON_LAST = 'Smith';
-    private const PERSON_MEMBERSHIP = 'Member';
-    private const PERSON_GENDER = 'M';
-    private const PERSON_CREATED = '2016-02-19T02:00:00Z';
-    private const PERSON_UPDATED = '2017-03-19T03:30:00Z';
-    private const DATE_FORMAT = 'Y-m-d\TH:i:s\Z';
 
     /** @var WebClientFactoryInterface */
     private $webClientFactory;
@@ -83,10 +78,6 @@ class PlanningCenterClientTest extends MockeryTestCase
                     'attributes' => [
                         'first_name' => self::PERSON_FIRST,
                         'last_name' => self::PERSON_LAST,
-                        'membership' => self::PERSON_MEMBERSHIP,
-                        'gender' => self::PERSON_GENDER,
-                        'created_at' => self::PERSON_CREATED,
-                        'updated_at' => self::PERSON_UPDATED,
                     ],
                     'relationships' => [
                         'emails' => [
@@ -109,8 +100,6 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->assertEquals(self::PERSON_FIRST, $contact->firstName);
         $this->assertEquals(self::PERSON_LAST, $contact->lastName);
         $this->assertEquals(self::EMAIL, $contact->email);
-        $this->assertEquals(self::PERSON_CREATED, $contact->createdAt->format(self::DATE_FORMAT));
-        $this->assertEquals(self::PERSON_UPDATED, $contact->updatedAt->format(self::DATE_FORMAT));
 
         $this->assertCount(2, $this->webHistory);
     }

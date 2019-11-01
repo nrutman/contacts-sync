@@ -8,6 +8,8 @@ use App\Contact\Contact;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Directory;
+use Google_Service_Directory_Member;
+use Google_Service_Directory_Members;
 use RuntimeException;
 
 class GoogleClient implements ReadableListClientInterface, WriteableListClientInterface
@@ -113,9 +115,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
      */
     public function getContactsForList(string $listName): array
     {
-        $members = $this->service->members->listMembers($listName)->getMembers();
-print_r($members); die();
-        return (is_array($members)) ? $members : [$members];
+        return self::membersToContacts($this->service->members->listMembers($listName));
     }
 
     /**
@@ -132,5 +132,23 @@ print_r($members); die();
     public function removeContact(Contact $contact): void
     {
         // TODO: Implement removeContact() method.
+    }
+
+    /**
+     * @param Google_Service_Directory_Members $members
+     * @return Contact[]
+     */
+    private static function membersToContacts(Google_Service_Directory_Members $members): array
+    {
+        $contacts = [];
+
+        /** @var Google_Service_Directory_Member $member */
+        foreach ($members->getMembers() as $member) {
+            $contact = new Contact();
+            $contact->email = $member->getEmail();
+            $contacts[] = $contact;
+        }
+
+        return $contacts;
     }
 }
