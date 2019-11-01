@@ -20,12 +20,12 @@ services:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    App\Client\PlanningCenterClient:
+    App\Client\PlanningCenter\PlanningCenterClient:
         arguments:
             $planningCenterAppId: '%planning_center.app.id%'
             $planningCenterAppSecret: '%planning_center.app.secret%'
 
-    App\Client\GoogleClient:
+    App\Client\Google\GoogleClient:
         arguments:
             $googleConfiguration: '%google.authentication%'
             $googleDomain: '%google.domain%'

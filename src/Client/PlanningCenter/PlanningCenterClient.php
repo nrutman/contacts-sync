@@ -4,7 +4,6 @@ namespace App\Client\PlanningCenter;
 
 use App\Client\ReadableListClientInterface;
 use App\Client\WebClientFactoryInterface;
-use Carbon\Carbon;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Contact\Contact;
@@ -39,7 +38,7 @@ class PlanningCenterClient implements ReadableListClientInterface
      *
      * @throws GuzzleException
      */
-    public function getContactsForList(string $listName): array
+    public function getContacts(string $listName): array
     {
         $response = $this->webClient->request('GET', '/people/v2/lists', [
             'query' => [

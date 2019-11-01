@@ -9,7 +9,6 @@ use Google_Client;
 use Google_Exception;
 use Google_Service_Directory;
 use Google_Service_Directory_Member;
-use Google_Service_Directory_Members;
 use RuntimeException;
 
 class GoogleClient implements ReadableListClientInterface, WriteableListClientInterface
@@ -113,42 +112,52 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     /**
      * {@inheritdoc}
      */
-    public function getContactsForList(string $listName): array
+    public function getContacts(string $listName): array
     {
-        return self::membersToContacts($this->service->members->listMembers($listName));
+        return array_map('self::memberToContact', (array) $this->service->members->listMembers($listName)->getMembers());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addContact(Contact $contact): void
+    public function addContact(string $list, Contact $contact): void
     {
-        // TODO: Implement addContact() method.
+        $member = self::contactToMember($contact);
+        $this->service->members->insert($list, $member);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeContact(Contact $contact): void
+    public function removeContact(string $list, Contact $contact): void
     {
-        // TODO: Implement removeContact() method.
+        $member = self::contactToMember($contact);
+        $this->service->members->delete($list, $member);
     }
 
     /**
-     * @param Google_Service_Directory_Members $members
-     * @return Contact[]
+     * @param Contact $contact
+     *
+     * @return Google_Service_Directory_Member
      */
-    private static function membersToContacts(Google_Service_Directory_Members $members): array
+    private static function contactToMember(Contact $contact): Google_Service_Directory_Member
     {
-        $contacts = [];
+        $member = new Google_Service_Directory_Member();
+        $member->setEmail($contact->email);
 
-        /** @var Google_Service_Directory_Member $member */
-        foreach ($members->getMembers() as $member) {
-            $contact = new Contact();
-            $contact->email = $member->getEmail();
-            $contacts[] = $contact;
-        }
+        return $member;
+    }
 
-        return $contacts;
+    /**
+     * @param Google_Service_Directory_Member $member
+     *
+     * @return Contact
+     */
+    private static function memberToContact(Google_Service_Directory_Member $member): Contact
+    {
+        $contact = new Contact();
+        $contact->email = $member->getEmail();
+
+        return $contact;
     }
 }

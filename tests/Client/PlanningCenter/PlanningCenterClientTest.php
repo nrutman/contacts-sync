@@ -90,7 +90,7 @@ class PlanningCenterClientTest extends MockeryTestCase
             ]))
         );
 
-        $result = $this->target->getContactsForList(self::LIST_NAME);
+        $result = $this->target->getContacts(self::LIST_NAME);
 
         $this->assertCount(1, $result);
 

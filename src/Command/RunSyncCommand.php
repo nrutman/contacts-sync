@@ -57,7 +57,7 @@ class RunSyncCommand extends Command
 
         $this->io->progressStart(count($lists));
         foreach ($lists as $list) {
-            $listContacts[$list] = $this->planningCenterClient->getContactsForList($list);
+            $listContacts[$list] = $this->planningCenterClient->getContacts($list);
             $this->io->progressAdvance();
         }
         $this->io->progressFinish();
@@ -96,7 +96,7 @@ class RunSyncCommand extends Command
             $this->log(sprintf('<info>Syncing %s</info>', $groupId));
         }
 
-        $groupMembers = $client->getContactsForList($groupId);
+        $groupMembers = $client->getContacts($groupId);
 
         /** @var Contact[] $contactsMappedByEmail */
         $contactsMappedByEmail = [];

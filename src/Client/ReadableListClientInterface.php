@@ -13,5 +13,5 @@ interface ReadableListClientInterface
      *
      * @return Contact[]
      */
-    public function getContactsForList(string $listName): array;
+    public function getContacts(string $listName): array;
 }

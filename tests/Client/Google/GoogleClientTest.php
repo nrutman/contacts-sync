@@ -81,7 +81,7 @@ class GoogleClientTest extends MockeryTestCase
                 'getMembers' => [$member],
             ]));
 
-        $result = $this->target->getContactsForList(self::GROUP_ID);
+        $result = $this->target->getContacts(self::GROUP_ID);
 
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
