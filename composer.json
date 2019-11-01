@@ -66,7 +66,7 @@
         ],
         "cs": "php-cs-fixer fix --config=.php_cs.dist -v --diff --dry-run",
         "cs-fix": "php-cs-fixer fix --config=.php_cs.dist -v --diff",
-        "test": "phpunit -c ."
+        "test": "simple-phpunit"
     },
     "conflict": {
         "symfony/symfony": "*"
