@@ -5,7 +5,8 @@ namespace App\Command;
 use App\Client\Google\GoogleClient;
 use App\Client\PlanningCenter\PlanningCenterClient;
 use App\Contact\Contact;
-use Carbon\Carbon;
+use App\Contact\ContactListDiff;
+use DateTime;
 use Exception;
 use Google_Service_Directory_Member;
 use Symfony\Component\Console\Command\Command;
@@ -19,16 +20,26 @@ class RunSyncCommand extends Command
     /** @var GoogleClient */
     protected $googleClient;
 
+    /** @var string[] */
+    protected $lists;
+
     /** @var SymfonyStyle */
     protected $io;
 
     /** @var PlanningCenterClient */
     protected $planningCenterClient;
 
+    /**
+     * @param string[] $lists
+     * @param GoogleClient $googleClient
+     * @param PlanningCenterClient $planningCenterClient
+     */
     public function __construct(
+        array $lists,
         GoogleClient $googleClient,
         PlanningCenterClient $planningCenterClient
     ) {
+        $this->lists = $lists;
         $this->googleClient = $googleClient;
         $this->planningCenterClient = $planningCenterClient;
         parent::__construct('sync:run');
@@ -51,28 +62,43 @@ class RunSyncCommand extends Command
     {
         $this->io = new SymfonyStyle($input, $output);
 
-        $listContacts = [];
-
-        $this->log('Retrieving lists from Planning Center...');
-
-        $this->io->progressStart(count($lists));
-        foreach ($lists as $list) {
-            $listContacts[$list] = $this->planningCenterClient->getContacts($list);
-            $this->io->progressAdvance();
+        if ($input->getOption('dry-run')) {
+            $this->log('NOTE: This is a dry run. The destination list will not be altered!'.PHP_EOL);
         }
-        $this->io->progressFinish();
 
-        $this->log('Done!');
+        foreach ($this->lists as $listIndex => $list) {
+            if ($listIndex > 0) {
+                $output->writeln('');
+            }
 
-        $this->io->table([
-            'List',
-            'Contacts',
-        ], array_map(static function ($contacts, $listName) {
-            return [$listName, count($contacts)];
-        }, $listContacts, array_keys($listContacts)));
+            // fetch the contacts from both lists
+            $this->log(sprintf('<comment>Processing %s (%d/%d)</comment>'.PHP_EOL, $list, ($listIndex + 1), count($this->lists)));
+            $sourceContacts = $this->planningCenterClient->getContacts($list);
+            $destContacts = $this->googleClient->getContacts($list);
 
-        foreach ($listContacts as $listName => $contacts) {
-            $this->syncContactsToGoogleGroup($this->googleClient, $listName, $contacts, $input->getOption('dry-run'));
+            // compute a diff
+            $diff = new ContactListDiff($sourceContacts, $destContacts);
+
+            $this->io->table(
+                ['Source', 'Destination', 'To Remove', 'To Add'],
+                [[count($sourceContacts), count($destContacts), count($diff->getContactsToRemove()), count($diff->getContactsToAdd())]]
+            );
+
+            // remove extra contacts
+            foreach ($diff->getContactsToRemove() as $removeIndex => $contact) {
+                $this->log(sprintf('Removing %s (%d/%d)', $contact->email, ($removeIndex + 1), count($diff->getContactsToRemove())));
+                if (!$input->getOption('dry-run')) {
+                    $this->googleClient->removeContact($list, $contact);
+                }
+            }
+
+            // add missing contacts
+            foreach ($diff->getContactsToAdd() as $addIndex => $contact) {
+                $this->log(sprintf('Adding %s (%d/%d)', $contact->email, ($addIndex + 1), count($diff->getContactsToAdd())));
+                if (!$input->getOption('dry-run')) {
+                    $this->googleClient->addContact($list, $contact);
+                }
+            }
         }
     }
 
@@ -144,7 +170,7 @@ class RunSyncCommand extends Command
      */
     private function log(string $message): void
     {
-        $timestamp = (new Carbon())->format('H:i:s');
+        $timestamp = (new DateTime())->format('H:i:s');
         $this->io->writeln(sprintf(' <info>[%s]</info> %s', $timestamp, $message));
     }
 }

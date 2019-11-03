@@ -132,7 +132,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     public function removeContact(string $list, Contact $contact): void
     {
         $member = self::contactToMember($contact);
-        $this->service->members->delete($list, $member);
+        $this->service->members->delete($list, $member->getEmail());
     }
 
     /**

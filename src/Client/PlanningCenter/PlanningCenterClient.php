@@ -40,6 +40,7 @@ class PlanningCenterClient implements ReadableListClientInterface
      */
     public function getContacts(string $listName): array
     {
+        // TODO Throw exception if the list can't be found (add @throws to interface)
         $response = $this->webClient->request('GET', '/people/v2/lists', [
             'query' => [
                 'where[name]' => $listName,
