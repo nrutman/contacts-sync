@@ -1,6 +1,6 @@
 <?php
 
-namespace Sync\Client;
+namespace App\Client;
 
 use GuzzleHttp\ClientInterface;
 

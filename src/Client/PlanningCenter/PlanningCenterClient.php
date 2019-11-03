@@ -1,38 +1,34 @@
 <?php
 
-namespace Sync\Client;
+namespace App\Client\PlanningCenter;
 
-use Carbon\Carbon;
+use App\Client\ReadableListClientInterface;
+use App\Client\WebClientFactoryInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Sync\Contact\Contact;
+use App\Contact\Contact;
 use function GuzzleHttp\Psr7\parse_query;
 
-class PlanningCenterClient implements PlanningCenterClientInterface
+class PlanningCenterClient implements ReadableListClientInterface
 {
-    /** @var string */
-    protected $applicationId;
-
-    /** @var string */
-    protected $applicationSecret;
-
     /** @var ClientInterface */
     protected $webClient;
 
     /**
-     * @param string $applicationId The application ID from Planning Center
-     * @param string $applicationSecret The secret from PlanningCenter
+     * @param string $planningCenterAppId
+     * @param string $planningCenterAppSecret
      * @param WebClientFactoryInterface $webClientFactory
      */
     public function __construct(
-        string $applicationId,
-        string $applicationSecret,
+        string $planningCenterAppId,
+        string $planningCenterAppSecret,
         WebClientFactoryInterface $webClientFactory
     ) {
-        $this->applicationId = $applicationId;
-        $this->applicationSecret = $applicationSecret;
         $this->webClient = $webClientFactory->create([
-            'auth' => [$this->applicationId, $this->applicationSecret],
+            'auth' => [
+                $planningCenterAppId,
+                $planningCenterAppSecret,
+            ],
             'base_uri' => 'https://api.planningcenteronline.com',
         ]);
     }
@@ -42,15 +38,23 @@ class PlanningCenterClient implements PlanningCenterClientInterface
      *
      * @throws GuzzleException
      */
-    public function getContacts(): array
+    public function getContacts(string $listName): array
     {
-        $query = [
-            'include' => 'emails',
-            'where[child]' => false,
-            'where[status]' => 'active',
-        ];
+        // TODO Throw exception if the list can't be found (add @throws to interface)
+        $response = $this->webClient->request('GET', '/people/v2/lists', [
+            'query' => [
+                'where[name]' => $listName,
+            ],
+        ]);
 
-        return $this->queryPeopleApi($query);
+        $lists = \GuzzleHttp\json_decode($response->getBody()->getContents(), true);
+        $list = array_filter($lists['data'], static function ($list) use ($listName) {
+            return preg_match(sprintf('/^%s$/i', $listName), $list['attributes']['name']);
+        });
+
+        return $this->queryPeopleApi([
+            'include' => 'emails',
+        ], sprintf('/people/v2/lists/%d/people', array_shift($list)['id']));
     }
 
     /**
@@ -105,12 +109,12 @@ class PlanningCenterClient implements PlanningCenterClientInterface
      *
      * @throws GuzzleException
      */
-    private function queryPeopleApi(array $query): array
+    private function queryPeopleApi(array $query, string $url = '/people/v2/people'): array
     {
         $contacts = [];
 
         do {
-            $response = $this->webClient->request('GET', '/people/v2/people', [
+            $response = $this->webClient->request('GET', $url, [
                 'query' => $query,
             ]);
 
@@ -125,15 +129,11 @@ class PlanningCenterClient implements PlanningCenterClientInterface
                     return;
                 }
 
-                $contacts[] = new Contact(
-                    $person['attributes']['first_name'],
-                    $person['attributes']['last_name'],
-                    $email,
-                    $person['attributes']['membership'],
-                    $person['attributes']['gender'],
-                    new Carbon($person['attributes']['created_at']),
-                    new Carbon($person['attributes']['updated_at'])
-                );
+                $contact = new Contact();
+                $contact->firstName = $person['attributes']['first_name'];
+                $contact->lastName = $person['attributes']['last_name'];
+                $contact->email = $email;
+                $contacts[] = $contact;
             });
         } while (
             // if a NEXT link exists, we want to parse the next query from it...otherwise we assign a blank array and
@@ -144,6 +144,13 @@ class PlanningCenterClient implements PlanningCenterClientInterface
         return $contacts;
     }
 
+    /**
+     * Extracts a querystring array from a url string.
+     *
+     * @param string $url
+     *
+     * @return array
+     */
     private static function getQueryFromUrl(string $url): array
     {
         return parse_query(parse_url($url, PHP_URL_QUERY));
