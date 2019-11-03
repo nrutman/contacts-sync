@@ -65,5 +65,4 @@ class ContactListDiff
 
         return $map;
     }
-
 }
