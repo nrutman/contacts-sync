@@ -18,6 +18,8 @@ use App\Client\Google\GoogleServiceFactory;
 
 class GoogleClientTest extends MockeryTestCase
 {
+    private const AUTH_CODE = 'AUTH:CODE{}';
+    private const AUTH_URL = 'http://auth/url';
     private const CONFIGURATION = [
         'authentication' => self::GOOGLE_AUTH,
         'domain' => self::DOMAIN,
@@ -229,5 +231,36 @@ class GoogleClientTest extends MockeryTestCase
             ->with(self::GROUP_ID, self::MEMBER_EMAIL);
 
         $this->target->removeContact(self::GROUP_ID, $contact);
+    }
+
+    public function test_getAuthUrl(): void
+    {
+        $this->client
+            ->shouldReceive('createAuthUrl')
+            ->andReturn(self::AUTH_URL);
+
+        $result = $this->target->getAuthUrl();
+
+        $this->assertEquals(self::AUTH_URL, $result);
+    }
+
+    public function test_setAuthCode(): void
+    {
+        $this->client
+            ->shouldReceive('fetchAccessTokenWithAuthCode')
+            ->with(self::AUTH_CODE)
+            ->andReturn(self::TOKEN_ARRAY);
+
+        $this->client
+            ->shouldReceive('setAccessToken');
+
+        $this->client
+            ->shouldReceive('getAccessToken')
+            ->andReturn(self::TOKEN_ARRAY);
+
+        $this->fileProvider
+            ->shouldReceive('saveContents');
+
+        $this->target->setAuthCode(self::AUTH_CODE);
     }
 }
