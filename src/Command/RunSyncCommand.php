@@ -8,6 +8,7 @@ use App\Contact\Contact;
 use App\Contact\ContactListDiff;
 use DateTime;
 use Exception;
+use Google_Exception;
 use Google_Service_Directory_Member;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +34,8 @@ class RunSyncCommand extends Command
      * @param string[] $lists
      * @param GoogleClient $googleClient
      * @param PlanningCenterClient $planningCenterClient
+     *
+     * @throws Google_Exception
      */
     public function __construct(
         array $lists,
@@ -40,7 +43,7 @@ class RunSyncCommand extends Command
         PlanningCenterClient $planningCenterClient
     ) {
         $this->lists = $lists;
-        $this->googleClient = $googleClient;
+        $this->googleClient = $googleClient->initialize();
         $this->planningCenterClient = $planningCenterClient;
         parent::__construct('sync:run');
     }
