@@ -12,6 +12,7 @@ use Google_Service_Directory;
 use Google_Service_Directory_Member;
 use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class GoogleClient implements ReadableListClientInterface, WriteableListClientInterface
 {
@@ -52,10 +53,10 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         string $varPath
     ) {
         $this->client = $client;
+        $this->service = $googleServiceFactory->create($this->client);
+        $this->fileProvider = $fileProvider;
         $this->configuration = $googleConfiguration;
         $this->domain = $googleDomain;
-        $this->fileProvider = $fileProvider;
-        $this->service = $googleServiceFactory->create($this->client);
         $this->varPath = $varPath;
     }
 
@@ -66,6 +67,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
      *
      * @return GoogleClient
      *
+     * @throws FileNotFoundException
      * @throws Google_Exception
      */
     public function initialize(): self
@@ -80,11 +82,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         $this->client->setPrompt('select_account consent');
         $this->client->setHostedDomain($this->domain);
 
-        // Load previously authorized token from a file, if it exists.
-        // The file token.json stores the user's access and refresh tokens, and is
-        // created automatically when the authorization flow completes for the first
-        // time.
-
+        // try to load the token from the saved file
         try {
             $this->client->setAccessToken($this->getToken());
         } catch (InvalidArgumentException $invalidArgumentException) {
@@ -96,12 +94,10 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
                 throw new InvalidGoogleTokenException();
             }
             $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+            $this->saveToken();
         }
 
-        $this->saveToken();
-
         return $this;
-
 
 //        $tokenPath = $this->getTokenPath();
 //        if (file_exists($tokenPath)) {
@@ -182,8 +178,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
      */
     public function removeContact(string $list, Contact $contact): void
     {
-        $member = self::contactToMember($contact);
-        $this->service->members->delete($list, $member->getEmail());
+        $this->service->members->delete($list, $contact->email);
     }
 
     /**
@@ -202,6 +197,8 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     /**
      * @param Google_Service_Directory_Member $member
      *
+     * @see getContacts
+     *
      * @return Contact
      */
     private static function memberToContact(Google_Service_Directory_Member $member): Contact
@@ -214,10 +211,12 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
 
     /**
      * @return array
+     *
+     * @throws FileNotFoundException
      */
     private function getToken(): array
     {
-        return \GuzzleHttp\json_decode($this->fileProvider->getContents(sprintf('%s/%s', $this->varPath, self::TOKEN_FILENAME)), true);
+        return \GuzzleHttp\json_decode($this->fileProvider->getContents($this->getTokenPath()), true);
     }
 
     /**
@@ -227,7 +226,6 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     {
         return sprintf('%s/%s', $this->varPath, self::TOKEN_FILENAME);
     }
-
 
     private function saveToken(): void
     {
