@@ -7,6 +7,8 @@ use App\Client\PlanningCenter\PlanningCenterClient;
 use App\Contact\ContactListDiff;
 use DateTime;
 use Exception;
+use Google_Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -61,6 +63,13 @@ class RunSyncCommand extends Command
         );
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @throws Google_Exception
+     * @throws GuzzleException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new SymfonyStyle($input, $output);
@@ -69,6 +78,7 @@ class RunSyncCommand extends Command
             $this->googleClient->initialize();
         } catch (FileNotFoundException $fileNotFoundException) {
             $this->io->error(sprintf('The Google Client cannot authenticate with your account. Please run the %s command to setup authentication.', ConfigureSyncCommand::$defaultName));
+
             return;
         }
 
