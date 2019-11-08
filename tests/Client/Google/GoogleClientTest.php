@@ -233,13 +233,13 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->removeContact(self::GROUP_ID, $contact);
     }
 
-    public function test_getAuthUrl(): void
+    public function test_createAuthUrl(): void
     {
         $this->client
             ->shouldReceive('createAuthUrl')
             ->andReturn(self::AUTH_URL);
 
-        $result = $this->target->getAuthUrl();
+        $result = $this->target->createAuthUrl();
 
         $this->assertEquals(self::AUTH_URL, $result);
     }

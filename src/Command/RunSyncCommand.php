@@ -77,7 +77,7 @@ class RunSyncCommand extends Command
         try {
             $this->googleClient->initialize();
         } catch (FileNotFoundException $fileNotFoundException) {
-            $this->io->error(sprintf('The Google Client cannot authenticate with your account. Please run the %s command to setup authentication.', ConfigureSyncCommand::$defaultName));
+            $this->io->error(sprintf('The Google Client cannot authenticate with your account. Please run the %s command to setup authentication.', ConfigureSyncCommand::getDefaultName()));
 
             return;
         }

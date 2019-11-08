@@ -134,7 +134,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     /**
      * @return string
      */
-    public function getAuthUrl(): string
+    public function createAuthUrl(): string
     {
         return $this->client->createAuthUrl();
     }
