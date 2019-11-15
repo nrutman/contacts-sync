@@ -98,37 +98,6 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         }
 
         return $this;
-
-//        $tokenPath = $this->getTokenPath();
-//        if (file_exists($tokenPath)) {
-//            $accessToken = \GuzzleHttp\json_decode(file_get_contents($tokenPath), true);
-//            $this->client->setAccessToken($accessToken);
-//        }
-//
-//        // If there is no previous token or it's expired.
-//        if ($this->client->isAccessTokenExpired()) {
-//            // Refresh the token if possible, else fetch a new one.
-//            if ($this->client->getRefreshToken()) {
-//                $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-//            } else {
-//                // Request authorization from the user.
-//                $authUrl = $this->client->createAuthUrl();
-//                printf("Open the following link in your browser:\n%s\n", $authUrl);
-//                echo 'Enter verification code: ';
-//                $authCode = trim(fgets(STDIN));
-//
-//                // Exchange authorization code for an access token.
-//                $accessToken = $this->client->fetchAccessTokenWithAuthCode($authCode);
-//                $this->client->setAccessToken($accessToken);
-//
-//                // Check to see if there was an error.
-//                if (array_key_exists('error', $accessToken)) {
-//                    throw new RuntimeException(implode(', ', $accessToken));
-//                }
-//            }
-//            // Save the token to a file.
-//            file_put_contents($tokenPath, \GuzzleHttp\json_encode($this->client->getAccessToken()));
-//        }
     }
 
     /**
