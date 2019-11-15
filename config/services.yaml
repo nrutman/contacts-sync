@@ -13,6 +13,9 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $googleDomain: '%google.domain%'
+            $varPath: '%kernel.var_dir%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -28,8 +31,6 @@ services:
     App\Client\Google\GoogleClient:
         arguments:
             $googleConfiguration: '%google.authentication%'
-            $googleDomain: '%google.domain%'
-            $varPath: '%kernel.var_dir%'
 
     App\Command\RunSyncCommand:
         arguments:

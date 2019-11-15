@@ -4,19 +4,23 @@ namespace App\Command;
 
 use App\Client\Google\GoogleClient;
 use App\Client\PlanningCenter\PlanningCenterClient;
-use App\Contact\Contact;
 use App\Contact\ContactListDiff;
 use DateTime;
 use Exception;
-use Google_Service_Directory_Member;
+use Google_Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class RunSyncCommand extends Command
 {
+    /** @var string */
+    public static $defaultName = 'sync:run';
+
     /** @var GoogleClient */
     protected $googleClient;
 
@@ -42,7 +46,8 @@ class RunSyncCommand extends Command
         $this->lists = $lists;
         $this->googleClient = $googleClient;
         $this->planningCenterClient = $planningCenterClient;
-        parent::__construct('sync:run');
+
+        parent::__construct();
     }
 
     protected function configure(): void
@@ -58,12 +63,27 @@ class RunSyncCommand extends Command
         );
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @throws Google_Exception
+     * @throws GuzzleException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new SymfonyStyle($input, $output);
 
+        try {
+            $this->googleClient->initialize();
+        } catch (FileNotFoundException $fileNotFoundException) {
+            $this->io->error(sprintf('The Google Client cannot authenticate with your account. Please run the %s command to setup authentication.', ConfigureSyncCommand::getDefaultName()));
+
+            return;
+        }
+
         if ($input->getOption('dry-run')) {
-            $this->log('NOTE: This is a dry run. The destination list will not be altered!'.PHP_EOL);
+            $this->io->success('NOTE: This is a dry run. The destination list will not be altered!'.PHP_EOL);
         }
 
         foreach ($this->lists as $listIndex => $list) {
@@ -100,65 +120,6 @@ class RunSyncCommand extends Command
                 }
             }
         }
-    }
-
-    /**
-     * @param GoogleClient $client
-     * @param string $groupId
-     * @param Contact[] $contacts
-     * @param bool $isDryRun
-     *
-     * @throws Exception
-     */
-    private function syncContactsToGoogleGroup(
-        GoogleClient $client,
-        string $groupId,
-        array $contacts,
-        bool $isDryRun = false
-    ): void {
-        if ($isDryRun) {
-            $this->log(sprintf('<info>Syncing %s (dry run)</info>', $groupId));
-        } else {
-            $this->log(sprintf('<info>Syncing %s</info>', $groupId));
-        }
-
-        $groupMembers = $client->getContacts($groupId);
-
-        /** @var Contact[] $contactsMappedByEmail */
-        $contactsMappedByEmail = [];
-        foreach ($contacts as $contact) {
-            $contactsMappedByEmail[strtolower($contact->email)] = $contact;
-        }
-
-        $groupMembersMappedByEmail = [];
-        foreach ($groupMembers as $member) {
-            $groupMembersMappedByEmail[strtolower($member->getEmail())] = $member;
-        }
-
-        /** @var Contact[] $toAdd */
-        $toAdd = [];
-        /** @var Google_Service_Directory_Member[] $toRemove */
-        $toRemove = [];
-
-        // Find any emails in the contact list that are not in the Google group. These should be added.
-        array_push($toAdd, ...array_filter($contacts, static function (Contact $contact) use ($groupMembersMappedByEmail) {
-            return !isset($groupMembersMappedByEmail[strtolower($contact->email)]);
-        }));
-
-        // Find any Google group members that are not in the contact list. These should be removed.
-        array_push($toRemove, ...array_filter($groupMembers, static function (Google_Service_Directory_Member $member) use ($contactsMappedByEmail) {
-            return !isset($contactsMappedByEmail[strtolower($member->getEmail())]);
-        }));
-
-        $this->io->text(sprintf('Adding %d contacts...', count($toAdd)));
-        $this->io->listing(array_map(static function (Contact $contact) {
-            return sprintf('%s %s (%s)', $contact->firstName, $contact->lastName, $contact->email);
-        }, $toAdd));
-
-        $this->io->text(sprintf('Removing %d contacts...', count($toRemove)));
-        $this->io->listing(array_map(static function (Google_Service_Directory_Member $member) {
-            return $member->getEmail();
-        }, $toRemove));
     }
 
     /**
