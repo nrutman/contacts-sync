@@ -10,6 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Copy dumby parameters file
+      run: cp config/parameters.yml.dist config/parameters.yml
+
     - name: Validate composer.json and composer.lock
       run: composer validate
 

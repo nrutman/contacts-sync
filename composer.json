@@ -57,9 +57,6 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
-        "pre-install-cmd": [
-            "touch config/parameters.yml"
-        ],
         "post-install-cmd": [
             "@auto-scripts"
         ],
