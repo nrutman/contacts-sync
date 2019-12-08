@@ -1,0 +1,29 @@
+# The following sections should be setup via a command
+parameters:
+    # Planning Center Integration Credentials
+    planning_center.app.id: "{{PlanningCenter Application ID}}"
+    planning_center.app.secret: "{{PlanningCenter Secret}}"
+
+    # G Suite Integration Credentials
+    google.authentication:
+        installed:
+            client_id: "{{Google Client ID}}"
+            project_id: "{{Google Project ID}}"
+            auth_uri: "https://accounts.google.com/o/oauth2/auth"
+            token_uri: "https://oauth2.googleapis.com/token"
+            auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs"
+            client_secret: "{{Google Client Secret}}"
+            redirect_uris:
+                - "urn:ietf:wg:oauth:2.0:oob"
+                - "http://localhost"
+    google.domain: "{{G Suite Domain}}"
+
+    # Lists to Sync (the name of the Planning Center group should match the Google Group email)
+    lists:
+        - list1
+
+    # Contacts to Add Manually (these will be added to the destination group(s) even if they aren't in the source group)
+    contacts:
+        John Doe:
+            email: john@doe.email
+            list: destination-list@list.email # can also be an array of lists
