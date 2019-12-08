@@ -4,7 +4,9 @@ namespace App\Command;
 
 use App\Client\Google\GoogleClient;
 use App\Client\PlanningCenter\PlanningCenterClient;
-use App\Contact\ContactListDiff;
+use App\Contact\Contact;
+use App\Contact\ContactListAnalyzer;
+use App\Contact\InMemoryContactManager;
 use DateTime;
 use Exception;
 use Google_Exception;
@@ -24,6 +26,9 @@ class RunSyncCommand extends Command
     /** @var GoogleClient */
     protected $googleClient;
 
+    /** @var InMemoryContactManager */
+    protected $inMemoryContactManager;
+
     /** @var string[] */
     protected $lists;
 
@@ -37,15 +42,18 @@ class RunSyncCommand extends Command
      * @param string[] $lists
      * @param GoogleClient $googleClient
      * @param PlanningCenterClient $planningCenterClient
+     * @param InMemoryContactManager $inMemoryContactManager
      */
     public function __construct(
         array $lists,
         GoogleClient $googleClient,
-        PlanningCenterClient $planningCenterClient
+        PlanningCenterClient $planningCenterClient,
+        InMemoryContactManager $inMemoryContactManager
     ) {
         $this->lists = $lists;
         $this->googleClient = $googleClient;
         $this->planningCenterClient = $planningCenterClient;
+        $this->inMemoryContactManager = $inMemoryContactManager;
 
         parent::__construct();
     }
@@ -93,11 +101,14 @@ class RunSyncCommand extends Command
 
             // fetch the contacts from both lists
             $this->log(sprintf('<comment>Processing %s (%d/%d)</comment>'.PHP_EOL, $list, ($listIndex + 1), count($this->lists)));
-            $sourceContacts = $this->planningCenterClient->getContacts($list);
+            $sourceContacts = $this->mergeLists(
+                $this->planningCenterClient->getContacts($list),
+                $this->inMemoryContactManager->getContacts($list)
+            );
             $destContacts = $this->googleClient->getContacts($list);
 
             // compute a diff
-            $diff = new ContactListDiff($sourceContacts, $destContacts);
+            $diff = new ContactListAnalyzer($sourceContacts, $destContacts);
 
             $this->io->table(
                 ['Source', 'Destination', 'To Remove', 'To Add'],
@@ -120,6 +131,27 @@ class RunSyncCommand extends Command
                 }
             }
         }
+    }
+
+    /**
+     * @param array ...$lists
+     *
+     * @return Contact[]
+     */
+    private function mergeLists(array ...$lists): array
+    {
+        $uniqueContacts = [];
+
+        foreach ($lists as $list) {
+            /** @var Contact $contact */
+            foreach ($list as $contact) {
+                if (!isset($uniqueContacts[$contact->email])) {
+                    $uniqueContacts[$contact->email] = $contact;
+                }
+            }
+        }
+
+        return array_values($uniqueContacts);
     }
 
     /**
