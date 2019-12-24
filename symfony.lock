@@ -86,6 +86,9 @@
     "psr/container": {
         "version": "1.0.0"
     },
+    "psr/event-dispatcher": {
+        "version": "1.0.0"
+    },
     "psr/http-message": {
         "version": "1.0.1"
     },
@@ -138,9 +141,6 @@
     "symfony/css-selector": {
         "version": "v4.3.5"
     },
-    "symfony/debug": {
-        "version": "v4.3.5"
-    },
     "symfony/dependency-injection": {
         "version": "v4.3.5"
     },
@@ -149,6 +149,9 @@
     },
     "symfony/dotenv": {
         "version": "v4.3.5"
+    },
+    "symfony/error-handler": {
+        "version": "v5.0.2"
     },
     "symfony/event-dispatcher": {
         "version": "v4.3.5"
@@ -275,6 +278,9 @@
     },
     "symfony/test-pack": {
         "version": "v1.0.6"
+    },
+    "symfony/var-dumper": {
+        "version": "v5.0.2"
     },
     "symfony/var-exporter": {
         "version": "v4.3.5"
