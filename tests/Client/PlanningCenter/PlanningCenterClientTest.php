@@ -2,15 +2,15 @@
 
 namespace App\Test\Client;
 
+use App\Client\PlanningCenter\PlanningCenterClient;
+use App\Client\WebClientFactory;
+use App\Client\WebClientFactoryInterface;
+use App\Contact\Contact;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use App\Client\PlanningCenter\PlanningCenterClient;
-use App\Client\WebClientFactory;
-use App\Client\WebClientFactoryInterface;
-use App\Contact\Contact;
 
 class PlanningCenterClientTest extends MockeryTestCase
 {

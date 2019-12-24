@@ -2,6 +2,8 @@
 
 namespace App\Test\Client\Google;
 
+use App\Client\Google\GoogleClient;
+use App\Client\Google\GoogleServiceFactory;
 use App\Client\Google\InvalidGoogleTokenException;
 use App\Contact\Contact;
 use App\File\FileProvider;
@@ -11,10 +13,8 @@ use Google_Service_Directory_Member;
 use Google_Service_Directory_Members;
 use Google_Service_Directory_Resource_Members;
 use InvalidArgumentException;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use App\Client\Google\GoogleClient;
-use App\Client\Google\GoogleServiceFactory;
+use Mockery as m;
 
 class GoogleClientTest extends MockeryTestCase
 {

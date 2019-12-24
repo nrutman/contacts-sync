@@ -70,8 +70,6 @@ class ConfigureSyncCommand extends Command
     /**
      * Determines whether the Google Client can be initialized without error.
      *
-     * @return bool
-     *
      * @throws Google_Exception
      */
     private function isGoogleClientConfigured(): bool

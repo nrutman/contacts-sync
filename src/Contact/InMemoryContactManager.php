@@ -7,9 +7,6 @@ class InMemoryContactManager
     /** @var array */
     private $contactsByList = [];
 
-    /**
-     * @param array $inMemoryContacts
-     */
     public function __construct(array $inMemoryContacts)
     {
         foreach ($inMemoryContacts as $contact) {
@@ -32,8 +29,6 @@ class InMemoryContactManager
 
     /**
      * Returns in-memory contacts for the specified list.
-     *
-     * @param string $list
      *
      * @return Contact[]
      */

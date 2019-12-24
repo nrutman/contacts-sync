@@ -36,14 +36,6 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     /** @var string */
     protected $varPath;
 
-    /**
-     * @param Google_Client $client
-     * @param GoogleServiceFactory $googleServiceFactory
-     * @param FileProvider $fileProvider
-     * @param array $googleConfiguration
-     * @param string $googleDomain
-     * @param string $varPath
-     */
     public function __construct(
         Google_Client $client,
         GoogleServiceFactory $googleServiceFactory,
@@ -100,17 +92,11 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function createAuthUrl(): string
     {
         return $this->client->createAuthUrl();
     }
 
-    /**
-     * @param string $authCode
-     */
     public function setAuthCode(string $authCode)
     {
         $accessToken = $this->client->fetchAccessTokenWithAuthCode($authCode);
@@ -150,11 +136,6 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         $this->service->members->delete($list, $contact->email);
     }
 
-    /**
-     * @param Contact $contact
-     *
-     * @return Google_Service_Directory_Member
-     */
     private static function contactToMember(Contact $contact): Google_Service_Directory_Member
     {
         $member = new Google_Service_Directory_Member();
@@ -164,11 +145,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     }
 
     /**
-     * @param Google_Service_Directory_Member $member
-     *
      * @see getContacts
-     *
-     * @return Contact
      */
     private static function memberToContact(Google_Service_Directory_Member $member): Contact
     {
@@ -179,8 +156,6 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     }
 
     /**
-     * @return array
-     *
      * @throws FileNotFoundException
      */
     private function getToken(): array
@@ -188,9 +163,6 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         return \GuzzleHttp\json_decode($this->fileProvider->getContents($this->getTokenPath()), true);
     }
 
-    /**
-     * @return string
-     */
     private function getTokenPath(): string
     {
         return sprintf('%s/%s', $this->varPath, self::TOKEN_FILENAME);

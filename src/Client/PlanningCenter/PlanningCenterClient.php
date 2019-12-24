@@ -4,9 +4,9 @@ namespace App\Client\PlanningCenter;
 
 use App\Client\ReadableListClientInterface;
 use App\Client\WebClientFactoryInterface;
+use App\Contact\Contact;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use App\Contact\Contact;
 use function GuzzleHttp\Psr7\parse_query;
 
 class PlanningCenterClient implements ReadableListClientInterface
@@ -14,11 +14,6 @@ class PlanningCenterClient implements ReadableListClientInterface
     /** @var ClientInterface */
     protected $webClient;
 
-    /**
-     * @param string $planningCenterAppId
-     * @param string $planningCenterAppSecret
-     * @param WebClientFactoryInterface $webClientFactory
-     */
     public function __construct(
         string $planningCenterAppId,
         string $planningCenterAppSecret,
@@ -59,10 +54,6 @@ class PlanningCenterClient implements ReadableListClientInterface
 
     /**
      * Returns a mapping of email IDs to email addresses.
-     *
-     * @param array $emails
-     *
-     * @return array
      */
     private static function createEmailMap(array $emails): array
     {
@@ -79,11 +70,6 @@ class PlanningCenterClient implements ReadableListClientInterface
 
     /**
      * Returns an email from a Person array via API response.
-     *
-     * @param array $person
-     * @param array $emailMap
-     *
-     * @return string|null
      */
     private static function getEmailFromPerson(array $person, array $emailMap): ?string
     {
@@ -102,8 +88,6 @@ class PlanningCenterClient implements ReadableListClientInterface
      * Queries the Planning Center People API based on the query provided.
      *
      * @see https://developer.planning.center/docs/#/apps/people/2019-01-14/vertices/person
-     *
-     * @param array $query
      *
      * @return Contact[]
      *
@@ -146,10 +130,6 @@ class PlanningCenterClient implements ReadableListClientInterface
 
     /**
      * Extracts a querystring array from a url string.
-     *
-     * @param string $url
-     *
-     * @return array
      */
     private static function getQueryFromUrl(string $url): array
     {

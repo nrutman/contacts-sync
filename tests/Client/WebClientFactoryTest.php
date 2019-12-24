@@ -2,9 +2,9 @@
 
 namespace App\Test\Client;
 
-use Mockery\Adapter\Phpunit\MockeryTestCase;
 use App\Client\WebClientFactory;
 use GuzzleHttp\ClientInterface;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 
 class WebClientFactoryTest extends MockeryTestCase
 {

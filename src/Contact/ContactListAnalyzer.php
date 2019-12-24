@@ -15,7 +15,6 @@ class ContactListAnalyzer
      *
      * @param Contact[] $sourceList
      * @param Contact[] $destList
-     * @param bool $removeDuplicates
      */
     public function __construct(array $sourceList, array $destList, bool $removeDuplicates = true)
     {
@@ -48,7 +47,6 @@ class ContactListAnalyzer
      * @param Contact[] $diff
      * @param Contact[] $listOfRecord
      * @param Contact[] $listToVerify
-     * @param bool $removeDuplicates
      *
      * @return Contact[]
      */
@@ -79,8 +77,6 @@ class ContactListAnalyzer
      * Generates a map keyed by email address for each contact in a list.
      *
      * @param Contact[] $contacts
-     *
-     * @return array
      */
     private static function mapContactsByEmail(array $contacts): array
     {

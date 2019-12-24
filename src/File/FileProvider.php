@@ -10,10 +10,6 @@ class FileProvider
     /**
      * Reads the contents of a file if it exists.
      *
-     * @param string $filePath
-     *
-     * @return string
-     *
      * @throws FileNotFoundException
      */
     public function getContents(string $filePath): string
@@ -27,9 +23,6 @@ class FileProvider
 
     /**
      * Writes the contents of the specified file.
-     *
-     * @param string $filePath
-     * @param string $content
      *
      * @throws RuntimeException
      */

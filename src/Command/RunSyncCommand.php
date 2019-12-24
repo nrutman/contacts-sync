@@ -40,9 +40,6 @@ class RunSyncCommand extends Command
 
     /**
      * @param string[] $lists
-     * @param GoogleClient $googleClient
-     * @param PlanningCenterClient $planningCenterClient
-     * @param InMemoryContactManager $inMemoryContactManager
      */
     public function __construct(
         array $lists,
@@ -72,11 +69,6 @@ class RunSyncCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     *
      * @throws Google_Exception
      * @throws GuzzleException
      */
@@ -160,8 +152,6 @@ class RunSyncCommand extends Command
 
     /**
      * Custom logging function that adds a timestamp.
-     *
-     * @param string $message
      *
      * @throws Exception
      */
