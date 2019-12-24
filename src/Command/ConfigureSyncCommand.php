@@ -45,7 +45,7 @@ class ConfigureSyncCommand extends Command
         );
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -58,10 +58,12 @@ class ConfigureSyncCommand extends Command
             if (!$authCode) {
                 $io->error('A Google authentication code must be provided.');
 
-                return;
+                return 1;
             }
 
             $this->googleClient->setAuthCode($authCode);
+
+            return 0;
         }
     }
 

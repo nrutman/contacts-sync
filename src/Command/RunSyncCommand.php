@@ -75,10 +75,12 @@ class RunSyncCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
+     * @return int
+     *
      * @throws Google_Exception
      * @throws GuzzleException
      */
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->io = new SymfonyStyle($input, $output);
 
@@ -87,7 +89,7 @@ class RunSyncCommand extends Command
         } catch (FileNotFoundException $fileNotFoundException) {
             $this->io->error(sprintf('The Google Client cannot authenticate with your account. Please run the %s command to setup authentication.', ConfigureSyncCommand::getDefaultName()));
 
-            return;
+            return 1;
         }
 
         if ($input->getOption('dry-run')) {
@@ -131,6 +133,8 @@ class RunSyncCommand extends Command
                 }
             }
         }
+
+        return 0;
     }
 
     /**
