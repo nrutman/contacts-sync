@@ -2,13 +2,36 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %} | GSync</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
-        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-        {% block stylesheets %}{% endblock %}
+        <title>{% block title %}Welcome!{% endblock %} | Contacts Sync</title>
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
     </head>
     <body>
+        {% block navbar %}
+            <nav class="navbar" role="navigation">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href="{{ absolute_url(path('home')) }}">
+                        <i class="fad fa-lg fa-id-card"></i>
+                        Contacts Sync
+                    </a>
+                </div>
+                <div class="navbar-menu">
+                    <div class="navbar-start"></div>
+                    <div class="navbar-end">
+                        <div class="navbar-item">
+                            <div class="buttons">
+                                <a class="button is-primary" href="{{ path('login') }}">Login</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        {% endblock %}
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            <script src="https://kit.fontawesome.com/1654fad512.js" crossorigin="anonymous"></script>
+        {% endblock %}
     </body>
 </html>

@@ -1,7 +1,20 @@
-{% extends 'base.html.twig' %}
+{% extends 'app.html.twig' %}
 
 {%  block title %}Login{% endblock %}
 
 {% block body %}
+    <div class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-half is-offset-one-quarter">
+                    <h1 class="title is-4">To begin using Contacts Sync, sign-in with your Planning Center account&hellip;</h1>
 
+                    <a class="button is-large is-fullwidth">
+                        Login with
+                        <img src="{{ asset('build/img/logo/planning-center-emblem.svg') }}" alt="Planning Center">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

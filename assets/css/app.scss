@@ -1,0 +1,8 @@
+@charset "utf-8";
+
+@import url("https://fonts.googleapis.com/css?family=Fira+Sans:200,200i,400,400i,700,700i&display=swap");
+
+$family-sans-serif: "Fira Sans", sans-serif;
+
+@import "../../node_modules/bulma/bulma";
+@import "core/nav";
