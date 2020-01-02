@@ -15,6 +15,7 @@
         "ext-iconv": "*",
         "google/apiclient": "^2.4",
         "guzzlehttp/guzzle": "^6.4",
+        "league/oauth2-google": "^3.0",
         "sensio/framework-extra-bundle": "^5.1",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "5.0.*",
