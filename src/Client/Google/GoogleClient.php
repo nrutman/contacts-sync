@@ -6,6 +6,7 @@ use App\Client\ReadableListClientInterface;
 use App\Client\WriteableListClientInterface;
 use App\Contact\Contact;
 use App\File\FileProvider;
+use Doctrine\ORM\EntityManagerInterface;
 use Google_Client;
 use Google_Exception;
 use Google_Service_Directory;
@@ -27,6 +28,9 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     /** @var string */
     protected $domain;
 
+    /** @var EntityManagerInterface */
+    protected $entityManager;
+
     /** @var FileProvider */
     protected $fileProvider;
 
@@ -39,6 +43,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     public function __construct(
         Google_Client $client,
         GoogleServiceFactory $googleServiceFactory,
+        EntityManagerInterface $entityManager,
         FileProvider $fileProvider,
         array $googleConfiguration,
         string $googleDomain,
@@ -46,6 +51,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
     ) {
         $this->client = $client;
         $this->service = $googleServiceFactory->create($this->client);
+        $this->entityManager = $entityManager;
         $this->fileProvider = $fileProvider;
         $this->configuration = $googleConfiguration;
         $this->domain = $googleDomain;
@@ -77,6 +83,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         // try to load the token from the saved file
         try {
             $this->client->setAccessToken($this->getToken());
+            $this->echoToken();
         } catch (InvalidArgumentException $invalidArgumentException) {
             throw new InvalidGoogleTokenException($invalidArgumentException);
         }
@@ -155,6 +162,13 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
         return $contact;
     }
 
+    private function echoToken(): void
+    {
+        echo 'TOKEN'.PHP_EOL;
+        print_r($this->client->getAccessToken());
+        echo PHP_EOL;
+    }
+
     /**
      * @throws FileNotFoundException
      */
@@ -170,6 +184,7 @@ class GoogleClient implements ReadableListClientInterface, WriteableListClientIn
 
     private function saveToken(): void
     {
+        $this->echoToken();
         $this->fileProvider->saveContents($this->getTokenPath(), \GuzzleHttp\json_encode($this->client->getAccessToken()));
     }
 }

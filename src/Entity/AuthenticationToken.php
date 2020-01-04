@@ -6,6 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AuthenticationTokenRepository")
+ * @ORM\Table(name="authentication_token",indexes={
+ *     @ORM\Index(name="service", columns={"service"}),
+ *     @ORM\Index(name="user_id", columns={"user_id"})
+ * })
  */
 class AuthenticationToken
 {
@@ -47,6 +51,11 @@ class AuthenticationToken
     private $tokenType;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $tokenTimestamp;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $refreshToken;
@@ -55,6 +64,11 @@ class AuthenticationToken
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
 
     public function getId(): ?int
     {
@@ -156,4 +170,29 @@ class AuthenticationToken
 
         return $this;
     }
+
+    public function getTokenTimestamp(): ?int
+    {
+        return $this->tokenTimestamp;
+    }
+
+    public function setTokenTimestamp(int $tokenTimestamp): self
+    {
+        $this->tokenTimestamp = $tokenTimestamp;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
 }
