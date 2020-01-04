@@ -22,14 +22,19 @@ class AuthenticationToken
     private $service;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $userId;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $accessToken;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="integer")
      */
-    private $expiresAt;
+    private $expiresIn;
 
     /**
      * @ORM\Column(type="text")
@@ -80,18 +85,6 @@ class AuthenticationToken
         return $this;
     }
 
-    public function getExpiresAt(): ?\DateTimeInterface
-    {
-        return $this->expiresAt;
-    }
-
-    public function setExpiresAt(\DateTimeInterface $expiresAt): self
-    {
-        $this->expiresAt = $expiresAt;
-
-        return $this;
-    }
-
     public function getScope(): ?string
     {
         return $this->scope;
@@ -136,6 +129,30 @@ class AuthenticationToken
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(int $userId): self
+    {
+        $this->userId = $userId;
+
+        return $this;
+    }
+
+    public function getExpiresIn(): ?int
+    {
+        return $this->expiresIn;
+    }
+
+    public function setExpiresIn(int $expiresIn): self
+    {
+        $this->expiresIn = $expiresIn;
 
         return $this;
     }
