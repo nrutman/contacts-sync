@@ -32,6 +32,9 @@
     "doctrine/dbal": {
         "version": "v2.10.0"
     },
+    "doctrine/deprecations": {
+        "version": "v0.5.3"
+    },
     "doctrine/doctrine-bundle": {
         "version": "2.0",
         "recipe": {
@@ -105,6 +108,9 @@
             ".php_cs.dist"
         ]
     },
+    "friendsofphp/proxy-manager-lts": {
+        "version": "v1.0.3"
+    },
     "google/apiclient": {
         "version": "2.0",
         "recipe": {
@@ -135,6 +141,15 @@
     "hamcrest/hamcrest-php": {
         "version": "v2.0.0"
     },
+    "laminas/laminas-code": {
+        "version": "4.1.0"
+    },
+    "laminas/laminas-eventmanager": {
+        "version": "3.3.1"
+    },
+    "laminas/laminas-zendframework-bridge": {
+        "version": "1.2.0"
+    },
     "mockery/mockery": {
         "version": "1.2.4"
     },
@@ -149,6 +164,9 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.3"
+    },
+    "paragonie/constant_time_encoding": {
+        "version": "v2.4.0"
     },
     "php": {
         "version": "7.3"
@@ -457,6 +475,9 @@
     },
     "symfony/property-info": {
         "version": "v5.0.2"
+    },
+    "symfony/proxy-manager-bridge": {
+        "version": "v5.2.4"
     },
     "symfony/routing": {
         "version": "4.2",
