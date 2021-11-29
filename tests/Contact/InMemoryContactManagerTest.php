@@ -24,7 +24,7 @@ class InMemoryContactManagerTest extends MockeryTestCase
         $list1 = $target->getContacts('list1@list');
         $list2 = $target->getContacts('list2@list');
 
-        $this->assertCount(2, $list1);
-        $this->assertCount(1, $list2);
+        self::assertCount(2, $list1);
+        self::assertCount(1, $list2);
     }
 }

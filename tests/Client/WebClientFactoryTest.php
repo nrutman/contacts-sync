@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Client;
+namespace App\Tests\Client;
 
 use App\Client\WebClientFactory;
 use GuzzleHttp\ClientInterface;
@@ -15,7 +15,7 @@ class WebClientFactoryTest extends MockeryTestCase
         $target = new WebClientFactory();
         $result = $target->create();
 
-        $this->assertInstanceOf(ClientInterface::class, $result);
+        self::assertInstanceOf(ClientInterface::class, $result);
     }
 
     public function test_createWithConstructor()
@@ -23,7 +23,7 @@ class WebClientFactoryTest extends MockeryTestCase
         $target = new WebClientFactory(['base_uri' => self::URI]);
         $result = $target->create();
 
-        $this->assertEquals(self::URI, $result->getConfig('base_uri'));
+        self::assertEquals(self::URI, $result->getConfig('base_uri'));
     }
 
     public function test_createWithOverride()
@@ -31,6 +31,6 @@ class WebClientFactoryTest extends MockeryTestCase
         $target = new WebClientFactory();
         $result = $target->create(['base_uri' => self::URI]);
 
-        $this->assertEquals(self::URI, $result->getConfig('base_uri'));
+        self::assertEquals(self::URI, $result->getConfig('base_uri'));
     }
 }

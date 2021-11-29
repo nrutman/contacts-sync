@@ -20,9 +20,6 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class RunSyncCommand extends Command
 {
-    /** @var string */
-    public static $defaultName = 'sync:run';
-
     /** @var GoogleClient */
     protected $googleClient;
 
@@ -57,6 +54,7 @@ class RunSyncCommand extends Command
 
     protected function configure(): void
     {
+        $this->setName('sync:run');
         $this->setDescription('Syncs contacts from PlanningCenter to Google Groups');
         $this->setHelp('Fetches contacts from a PlanningCenter list and syncs its members to a Google Group of the same name.');
 

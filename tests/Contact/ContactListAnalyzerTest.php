@@ -19,10 +19,10 @@ class ContactListAnalyzerTest extends MockeryTestCase
 
         $target = new ContactListAnalyzer([$sharedContact, $missingContact], [$sharedContact, $extraContact]);
 
-        $this->assertCount(1, $target->getContactsToAdd());
-        $this->assertEquals($missingContact, $target->getContactsToAdd()[0]);
-        $this->assertCount(1, $target->getContactsToRemove());
-        $this->assertEquals($extraContact, $target->getContactsToRemove()[0]);
+        self::assertCount(1, $target->getContactsToAdd());
+        self::assertEquals($missingContact, $target->getContactsToAdd()[0]);
+        self::assertCount(1, $target->getContactsToRemove());
+        self::assertEquals($extraContact, $target->getContactsToRemove()[0]);
     }
 
     public function test_duplicates(): void
@@ -34,6 +34,6 @@ class ContactListAnalyzerTest extends MockeryTestCase
 
         $target = new ContactListAnalyzer([$contact, $duplicate], []);
 
-        $this->assertCount(1, $target->getContactsToAdd());
+        self::assertCount(1, $target->getContactsToAdd());
     }
 }
