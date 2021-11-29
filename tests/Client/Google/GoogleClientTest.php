@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Client\Google;
+namespace App\Tests\Client\Google;
 
 use App\Client\Google\GoogleClient;
 use App\Client\Google\GoogleServiceFactory;
@@ -196,15 +196,15 @@ class GoogleClientTest extends MockeryTestCase
 
         $result = $this->target->getContacts(self::GROUP_ID);
 
-        $this->assertIsArray($result);
-        $this->assertCount(1, $result);
+        self::assertIsArray($result);
+        self::assertCount(1, $result);
 
         /** @var Contact $contact */
         $contact = $result[0];
-        $this->assertInstanceOf(Contact::class, $contact);
-        $this->assertEquals(self::MEMBER_EMAIL, $contact->email);
-        $this->assertNull($contact->firstName);
-        $this->assertNull($contact->lastName);
+        self::assertInstanceOf(Contact::class, $contact);
+        self::assertEquals(self::MEMBER_EMAIL, $contact->email);
+        self::assertNull($contact->firstName);
+        self::assertNull($contact->lastName);
     }
 
     public function test_addContact(): void
@@ -241,7 +241,7 @@ class GoogleClientTest extends MockeryTestCase
 
         $result = $this->target->createAuthUrl();
 
-        $this->assertEquals(self::AUTH_URL, $result);
+        self::assertEquals(self::AUTH_URL, $result);
     }
 
     public function test_setAuthCode(): void

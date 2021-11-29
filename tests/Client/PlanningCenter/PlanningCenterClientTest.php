@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Client;
+namespace App\Tests\Client\PlanningCenter;
 
 use App\Client\PlanningCenter\PlanningCenterClient;
 use App\Client\WebClientFactory;
@@ -24,9 +24,6 @@ class PlanningCenterClientTest extends MockeryTestCase
     private const PERSON_FIRST = 'Joe';
     private const PERSON_LAST = 'Smith';
 
-    /** @var WebClientFactoryInterface */
-    private $webClientFactory;
-
     /** @var MockHandler */
     private $webHandler;
 
@@ -41,16 +38,16 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->webHandler = new MockHandler();
         $stack = HandlerStack::create($this->webHandler);
         $stack->push(Middleware::history($this->webHistory));
-        $this->webClientFactory = new WebClientFactory(['handler' => $stack]);
+        $webClientFactory = new WebClientFactory(['handler' => $stack]);
 
         $this->target = new PlanningCenterClient(
             self::APP_ID,
             self::APP_SECRET,
-            $this->webClientFactory
+            $webClientFactory
         );
     }
 
-    public function test_getContactsForList(): void
+    public function test_getContacts(): void
     {
         // fetch for the list
         $this->webHandler->append(
@@ -92,15 +89,31 @@ class PlanningCenterClientTest extends MockeryTestCase
 
         $result = $this->target->getContacts(self::LIST_NAME);
 
-        $this->assertCount(1, $result);
+        self::assertCount(1, $result);
 
-        /** @var Contact $contact */
         $contact = $result[0];
 
-        $this->assertEquals(self::PERSON_FIRST, $contact->firstName);
-        $this->assertEquals(self::PERSON_LAST, $contact->lastName);
-        $this->assertEquals(self::EMAIL, $contact->email);
+        self::assertEquals(self::PERSON_FIRST, $contact->firstName);
+        self::assertEquals(self::PERSON_LAST, $contact->lastName);
+        self::assertEquals(self::EMAIL, $contact->email);
 
-        $this->assertCount(2, $this->webHistory);
+        self::assertCount(2, $this->webHistory);
+    }
+
+    public function test_refreshList(): void
+    {
+        $this->webHandler->append(
+            new Response(200, [], \GuzzleHttp\json_encode([
+                'data' => [[
+                    'id' => self::LIST_ID,
+                ]],
+            ]))
+        );
+
+        $this->webHandler->append(new Response(204));
+
+        $this->target->refreshList(self::LIST_NAME);
+
+        self::assertCount(2, $this->webHistory);
     }
 }
