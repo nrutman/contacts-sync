@@ -65,6 +65,10 @@ class ConfigureSyncCommand extends Command
 
             return 0;
         }
+
+        $io->writeln('Google is already configured. If you want to reconfigure, use the --force option.');
+
+        return 0;
     }
 
     /**
