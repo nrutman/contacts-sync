@@ -8,15 +8,15 @@ This namespace contains the Google Workspace integration layer, communicating wi
 
 ```mermaid
 flowchart TD
-    A[initialize] --> B[Configure Google\Client\nscopes, credentials, offline access]
-    B --> C[Load token from\nvar/google-token.json]
+    A[initialize] --> B["Configure Google Client<br/>scopes, credentials, offline access"]
+    B --> C["Load token from<br/>var/google-token.json"]
     C --> D{Token valid?}
     D -- Yes --> E[✅ Ready]
-    D -- No --> F{Refresh token\navailable?}
+    D -- No --> F{"Refresh token<br/>available?"}
     F -- Yes --> G[Refresh access token]
     G --> H[Persist updated token to disk]
     H --> E
-    F -- No --> I[❌ Throw InvalidGoogleTokenException\nUser must run sync:configure]
+    F -- No --> I["❌ Throw InvalidGoogleTokenException<br/>User must run sync:configure"]
 ```
 
 The two required scopes are `ADMIN_DIRECTORY_GROUP` and `ADMIN_DIRECTORY_GROUP_MEMBER`. Access type is set to `offline` so that a refresh token is issued on initial authorization. The `select_account consent` prompt ensures the refresh token is always included.
