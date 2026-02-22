@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(php:*)",
-      "Bash(SYMFONY_PHPUNIT_VERSION=9.5 php:*)"
+      "Bash(SYMFONY_PHPUNIT_VERSION=9.5 php:*)",
+      "Bash(composer show:*)"
     ]
   }
 }
