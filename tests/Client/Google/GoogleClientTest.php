@@ -15,11 +15,11 @@ use Google_Service_Directory_Resource_Members;
 use InvalidArgumentException;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery as m;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class GoogleClientTest extends MockeryTestCase
 {
     private const AUTH_CODE = 'AUTH:CODE{}';
-    private const AUTH_URL = 'http://auth/url';
     private const CONFIGURATION = [
         'authentication' => self::GOOGLE_AUTH,
         'domain' => self::DOMAIN,
@@ -31,7 +31,7 @@ class GoogleClientTest extends MockeryTestCase
     private const TEMP_PATH = 'tmp/test';
     private const TOKEN_ARRAY = ['token' => 'foobar'];
     private const TOKEN_STRING = '{"token":"foobar"}';
-    private const TOKEN_FILENAME = 'google-token.json'; // matches class implementation
+    private const TOKEN_FILENAME = 'google-token.json';
     private const TOKEN_REFRESH = 'refresh.token';
 
     /** @var Google_Client|m\LegacyMockInterface|m\MockInterface */
@@ -70,16 +70,7 @@ class GoogleClientTest extends MockeryTestCase
 
     public function test_initialize(): void
     {
-        $this->client
-            ->shouldReceive([
-                'setApplicationName' => null,
-                'setScopes' => null,
-                'setAuthConfig' => null,
-                'setAccessType' => null,
-                'setPrompt' => null,
-                'setHostedDomain' => null,
-                'isAccessTokenExpired' => false,
-            ]);
+        $this->setupInitializeExpectations();
 
         $this->client
             ->shouldReceive('setAccessToken')
@@ -95,16 +86,7 @@ class GoogleClientTest extends MockeryTestCase
 
     public function test_initialize_invalidToken(): void
     {
-        $this->client
-            ->shouldReceive([
-                'setApplicationName' => null,
-                'setScopes' => null,
-                'setAuthConfig' => null,
-                'setAccessType' => null,
-                'setPrompt' => null,
-                'setHostedDomain' => null,
-                'isAccessTokenExpired' => false,
-            ]);
+        $this->setupInitializeExpectations();
 
         $this->client
             ->shouldReceive('setAccessToken')
@@ -123,19 +105,12 @@ class GoogleClientTest extends MockeryTestCase
 
     public function test_initialize_refreshToken(): void
     {
-        $this->client
-            ->shouldReceive([
-                'setApplicationName' => null,
-                'setScopes' => null,
-                'setAuthConfig' => null,
-                'setAccessType' => null,
-                'setPrompt' => null,
-                'setHostedDomain' => null,
-                'isAccessTokenExpired' => true,
-                'getRefreshToken' => self::TOKEN_REFRESH,
-                'fetchAccessTokenWithRefreshToken' => null,
-                'getAccessToken' => self::TOKEN_ARRAY,
-            ]);
+        $this->setupInitializeExpectations([
+            'isAccessTokenExpired' => true,
+            'getRefreshToken' => self::TOKEN_REFRESH,
+            'fetchAccessTokenWithRefreshToken' => null,
+            'getAccessToken' => self::TOKEN_ARRAY,
+        ]);
 
         $this->client
             ->shouldReceive('setAccessToken')
@@ -155,17 +130,10 @@ class GoogleClientTest extends MockeryTestCase
 
     public function test_initialize_invalidRefreshToken(): void
     {
-        $this->client
-            ->shouldReceive([
-                'setApplicationName' => null,
-                'setScopes' => null,
-                'setAuthConfig' => null,
-                'setAccessType' => null,
-                'setPrompt' => null,
-                'setHostedDomain' => null,
-                'isAccessTokenExpired' => true,
-                'getRefreshToken' => null,
-            ]);
+        $this->setupInitializeExpectations([
+            'isAccessTokenExpired' => true,
+            'getRefreshToken' => null,
+        ]);
 
         $this->client
             ->shouldReceive('setAccessToken')
@@ -177,6 +145,20 @@ class GoogleClientTest extends MockeryTestCase
             ->andReturn(self::TOKEN_STRING);
 
         $this->expectException(InvalidGoogleTokenException::class);
+
+        $this->target->initialize();
+    }
+
+    public function test_initialize_tokenFileNotFound(): void
+    {
+        $this->setupInitializeExpectations();
+
+        $this->fileProvider
+            ->shouldReceive('getContents')
+            ->with(self::TEMP_PATH.'/'.self::TOKEN_FILENAME)
+            ->andThrow(new FileNotFoundException());
+
+        $this->expectException(FileNotFoundException::class);
 
         $this->target->initialize();
     }
@@ -233,17 +215,6 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->removeContact(self::GROUP_ID, $contact);
     }
 
-    public function test_createAuthUrl(): void
-    {
-        $this->client
-            ->shouldReceive('createAuthUrl')
-            ->andReturn(self::AUTH_URL);
-
-        $result = $this->target->createAuthUrl();
-
-        self::assertEquals(self::AUTH_URL, $result);
-    }
-
     public function test_setAuthCode(): void
     {
         $this->client
@@ -262,5 +233,37 @@ class GoogleClientTest extends MockeryTestCase
             ->shouldReceive('saveContents');
 
         $this->target->setAuthCode(self::AUTH_CODE);
+    }
+
+    public function test_setAuthCode_throwsOnErrorResponse(): void
+    {
+        $errorToken = ['error' => 'invalid_grant'];
+
+        $this->client
+            ->shouldReceive('fetchAccessTokenWithAuthCode')
+            ->with(self::AUTH_CODE)
+            ->andReturn($errorToken);
+
+        $this->client
+            ->shouldReceive('setAccessToken');
+
+        $this->expectException(InvalidGoogleTokenException::class);
+
+        $this->target->setAuthCode(self::AUTH_CODE);
+    }
+
+    private function setupInitializeExpectations(array $overrides = []): void
+    {
+        $defaults = [
+            'setApplicationName' => null,
+            'setScopes' => null,
+            'setAuthConfig' => null,
+            'setAccessType' => null,
+            'setPrompt' => null,
+            'setHostedDomain' => null,
+            'isAccessTokenExpired' => false,
+        ];
+
+        $this->client->shouldReceive(array_merge($defaults, $overrides));
     }
 }

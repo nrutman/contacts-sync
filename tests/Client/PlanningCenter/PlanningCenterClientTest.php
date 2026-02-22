@@ -232,6 +232,20 @@ class PlanningCenterClientTest extends MockeryTestCase
         self::assertCount(0, $result);
     }
 
+    public function test_getContacts_listNotFound(): void
+    {
+        $this->webHandler->append(
+            new Response(200, [], \GuzzleHttp\json_encode([
+                'data' => [],
+            ]))
+        );
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The list `list@list.com` could not be found.');
+
+        $this->target->getContacts(self::LIST_NAME);
+    }
+
     public function test_refreshList_listNotFound(): void
     {
         $this->webHandler->append(

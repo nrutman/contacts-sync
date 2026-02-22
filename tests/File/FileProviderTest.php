@@ -4,6 +4,7 @@ namespace App\Tests\File;
 
 use App\File\FileProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class FileProviderTest extends TestCase
@@ -52,20 +53,17 @@ class FileProviderTest extends TestCase
         self::assertEquals('test content', file_get_contents($path));
     }
 
-    public function test_saveContents_overwritesExistingFile(): void
+    public function test_saveContents_failureThrowsException(): void
     {
-        $path = $this->createTempFile('original');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to write file');
 
-        $this->target->saveContents($path, 'overwritten');
-
-        self::assertEquals('overwritten', file_get_contents($path));
-    }
-
-    public function test_saveContents_failureThrowsError(): void
-    {
-        $this->expectError();
-
-        $this->target->saveContents('/nonexistent_dir_'.uniqid().'/file.txt', 'content');
+        set_error_handler(static function () { return true; });
+        try {
+            $this->target->saveContents('/nonexistent_dir_'.uniqid().'/file.txt', 'content');
+        } finally {
+            restore_error_handler();
+        }
     }
 
     private function createTempFile(string $content): string

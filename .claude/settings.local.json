@@ -3,7 +3,8 @@
     "allow": [
       "Bash(php:*)",
       "Bash(SYMFONY_PHPUNIT_VERSION=9.5 php:*)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "Bash(PATH=\"/opt/homebrew/Cellar/php@7.4/7.4.33_9/bin:$PATH\" /opt/homebrew/Cellar/php@7.4/7.4.33_9/bin/php:*)"
     ]
   }
 }
