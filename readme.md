@@ -1,42 +1,24 @@
-# Contacts Sync
+# 📇 Contacts Sync
+
 A Symfony console application to sync contacts from Planning Center to Google Groups. The application queries both sources for lists named after distribution groups. It then diffs the contacts and makes sure the Google group mirrors the contacts found in Planning Center.
 
-## Architecture Overview
-
+```mermaid
+flowchart LR
+    PC[Planning Center API] --> Merge[Merge & Deduplicate]
+    Mem[In-Memory Contacts] --> Merge
+    Merge --> Diff[Compute Diff]
+    Diff --> Google[Google Groups API]
 ```
-Planning Center API ──┐
-                      ├── merge & deduplicate ──► ContactListAnalyzer ──► Google Groups API
-In-Memory Contacts ───┘        (source)              (diff)                (destination)
-```
 
-| Component | Namespace | Role |
-|-----------|-----------|------|
-| `PlanningCenterClient` | `App\Client\PlanningCenter` | Reads contacts from Planning Center lists via REST API |
-| `GoogleClient` | `App\Client\Google` | Reads/writes contacts to Google Groups via Directory API |
-| `InMemoryContactManager` | `App\Contact` | Provides manually-configured contacts from `parameters.yml` |
-| `ContactListAnalyzer` | `App\Contact` | Computes the diff between source and destination contact lists |
-| `FileProvider` | `App\File` | Abstracts file read/write operations (used for token storage) |
-| `RunSyncCommand` | `App\Command` | Orchestrates the full sync workflow |
-| `ConfigureSyncCommand` | `App\Command` | Interactive Google OAuth setup |
-| `RefreshPlanningCenterListsCommand` | `App\Command` | Triggers a Planning Center list refresh |
+## 📦 Installation
 
-## Sync Algorithm
-
-The `sync:run` command executes the following steps for each configured list:
-
-1. **Initialize Google Client** — loads the stored OAuth token (from `var/google-token.json`), refreshing it if expired.
-2. **Fetch source contacts** — queries Planning Center for the list's members and merges them with any in-memory contacts configured for the same list. Contacts are deduplicated by email address during the merge.
-3. **Fetch destination contacts** — queries the Google Group with the same name for its current members.
-4. **Compute diff** — `ContactListAnalyzer` compares the two lists by email (case-insensitive) to determine contacts to add and contacts to remove.
-5. **Apply changes** — removes extra contacts from the Google Group, then adds missing contacts. If `--dry-run` is set, changes are logged but not applied.
-
-## Installation
 All dependencies can be installed using the [Composer PHP dependency manager](https://getcomposer.org/). Once Composer is installed, [download this repository](https://github.com/nrutman/contacts-sync/releases) and run the following command:
 ```bash
 composer install
 ```
 
-## Configuration
+## ⚙️ Configuration
+
 Included in the `config` folder is a `parameters.yml.dist` file. Complete the following steps:
 1. Copy this file and rename it `parameters.yml`.
 2. Fill in all of the tokens with configuration for Planning Center and Google.
@@ -74,9 +56,10 @@ contacts:
 
 In-memory contacts are merged with Planning Center contacts before the diff is computed. If the same email exists in both sources, it is included only once.
 
-## Usage
+## 🚀 Usage
 
-### sync:configure
+### `sync:configure`
+
 To configure the command by provisioning a token with your Google Workspace user, run the following command:
 ```bash
 bin/console sync:configure
@@ -87,9 +70,10 @@ The command will provide a Google authentication URL which will require you to l
 | --------- | ----------- |
 | --force   | Forces the command to overwrite an existing Google token. |
 
-**Note:** the resulting Google token is stored in the `var/google-token.json` file. If at any time you have problems with Google authentication, delete this file and rerun the `sync:configure` command (or use the `--force` parameter).
+> **Note:** the resulting Google token is stored in the `var/google-token.json` file. If at any time you have problems with Google authentication, delete this file and rerun the `sync:configure` command (or use the `--force` parameter).
 
-### sync:run
+### `sync:run`
+
 To sync contacts between lists, simply run the following command:
 ```bash
 bin/console sync:run
@@ -100,7 +84,8 @@ This will fetch the lists, run a diff, and display information for changes it is
 | --------- | ----------- |
 | --dry-run | Computes the diff and outputs data without actually updating the groups. |
 
-### planning-center:refresh
+### `planning-center:refresh`
+
 Refreshes a Planning Center list so it contains the most up-to-date contacts. Planning Center lists are computed on-demand, so running this command before a sync ensures the source data is current.
 
 ```bash
@@ -115,54 +100,7 @@ bin/console planning-center:refresh all
 |------------|-------------|
 | list-name  | The name of the list to refresh. Pass `all` to refresh all configured lists. |
 
-## Developer Guide
-
-### Prerequisites
-
-- PHP 8.5+
-- [Composer](https://getcomposer.org/)
-
-### Running Tests
-
-```bash
-composer run-script test
-```
-
-Or directly via PHPUnit:
-
-```bash
-php vendor/bin/phpunit
-```
-
-### Code Style
-
-The project uses [PHP-CS-Fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) for code formatting. To check for violations:
-
-```bash
-composer run-script cs
-```
-
-To auto-fix violations:
-
-```bash
-composer run-script cs-fix
-```
-
-### Project Structure
-
-```
-src/
-├── Client/              # API client interfaces and implementations
-│   ├── Google/          # Google Directory API integration
-│   └── PlanningCenter/  # Planning Center API integration
-├── Command/             # Symfony console commands
-├── Contact/             # Contact domain objects and diff logic
-└── File/                # File I/O utilities
-tests/                   # PHPUnit tests (mirrors src/ structure)
-config/                  # Symfony configuration and parameters
-```
-
-## Troubleshooting
+## 🔧 Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
@@ -171,3 +109,7 @@ config/                  # Symfony configuration and parameters
 | Google token keeps expiring | Ensure `setAccessType('offline')` is configured (default). Re-run `sync:configure --force` to get a new refresh token. |
 | `The list 'X' could not be found` | The list name in `parameters.yml` does not match any Planning Center list. Verify the exact name in Planning Center. |
 | `Unknown list specified: X` | The list name passed to `planning-center:refresh` is not in the configured `lists` parameter. Use `all` or a valid list name. |
+
+## 📖 Technical Documentation
+
+For architecture details, the sync algorithm, and developer guidance, see the [src/README.md](src/README.md). Each namespace within `src/` also contains its own README with implementation-specific documentation.
