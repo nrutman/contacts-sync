@@ -1,6 +1,6 @@
 # 🧩 Source Code — Technical Overview
 
-This document covers the architecture, internal design, and developer workflow for the Contacts Sync application. For installation, configuration, and usage instructions, see the [project README](../readme.md).
+This document covers the architecture, internal design, and developer workflow for the Contacts Sync application. For installation, configuration, and usage instructions, see the [project README](../README.md).
 
 ## 🏗️ Architecture
 

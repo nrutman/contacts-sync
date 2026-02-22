@@ -1,6 +1,6 @@
 # ⚡ Command Namespace
 
-Console commands registered via Symfony's `autoconfigure` and invoked through `bin/console`. User-facing documentation (options, arguments, examples) lives in the [project README](../../readme.md#-usage).
+Console commands registered via Symfony's `autoconfigure` and invoked through `bin/console`. User-facing documentation (options, arguments, examples) lives in the [project README](../../README.md#-usage).
 
 ## 📌 Behavioral Notes
 

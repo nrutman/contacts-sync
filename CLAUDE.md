@@ -4,7 +4,7 @@
 
 Read these READMEs to understand the codebase before making changes:
 
-- [readme.md](readme.md) — installation, configuration, and usage
+- [README.md](README.md) — installation, configuration, and usage
 - [src/README.md](src/README.md) — architecture, sync algorithm, dependency injection, project structure, developer guide
 - [src/Client/README.md](src/Client/README.md) — client design and interface contracts
 - [src/Client/Google/README.md](src/Client/Google/README.md) — Google OAuth lifecycle and token management
