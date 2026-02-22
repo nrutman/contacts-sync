@@ -33,7 +33,7 @@ class RunSyncCommandTest extends MockeryTestCase
         $this->inMemoryContactManager = m::mock(InMemoryContactManager::class);
     }
 
-    public function test_execute_successfulSync(): void
+    public function testExecuteSuccessfulSync(): void
     {
         $sourceContact = $this->makeContact('source@test.com', 'John', 'Doe');
         $destContact = $this->makeContact('old@test.com');
@@ -52,7 +52,7 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString('old@test.com', $tester->getDisplay());
     }
 
-    public function test_execute_dryRun(): void
+    public function testExecuteDryRun(): void
     {
         $sourceContact = $this->makeContact('source@test.com');
         $destContact = $this->makeContact('old@test.com');
@@ -70,7 +70,7 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString('dry run', $tester->getDisplay());
     }
 
-    public function test_execute_googleNotConfigured(): void
+    public function testExecuteGoogleNotConfigured(): void
     {
         $this->googleClient->shouldReceive('initialize')->once()->andThrow(new FileNotFoundException());
 
@@ -80,7 +80,7 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString('cannot authenticate', $tester->getDisplay());
     }
 
-    public function test_execute_multipleLists(): void
+    public function testExecuteMultipleLists(): void
     {
         $contact1 = $this->makeContact('a@test.com');
         $contact2 = $this->makeContact('b@test.com');
@@ -102,7 +102,7 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString('2/2', $tester->getDisplay());
     }
 
-    public function test_execute_mergesInMemoryContacts(): void
+    public function testExecuteMergesInMemoryContacts(): void
     {
         $pcContact = $this->makeContact('pc@test.com');
         $memContact = $this->makeContact('mem@test.com');
@@ -120,7 +120,7 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString('mem@test.com', $tester->getDisplay());
     }
 
-    public function test_execute_mergeDeduplicatesContacts(): void
+    public function testExecuteMergeDeduplicatesContacts(): void
     {
         $pcContact = $this->makeContact('same@test.com');
         $memContact = $this->makeContact('same@test.com');
@@ -136,7 +136,7 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertEquals(0, $tester->getStatusCode());
     }
 
-    public function test_execute_noChangesNeeded(): void
+    public function testExecuteNoChangesNeeded(): void
     {
         $contact = $this->makeContact('shared@test.com');
         $destContact = $this->makeContact('shared@test.com');

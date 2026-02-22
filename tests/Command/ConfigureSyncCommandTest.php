@@ -31,7 +31,7 @@ class ConfigureSyncCommandTest extends MockeryTestCase
         );
     }
 
-    public function test_execute_alreadyConfigured(): void
+    public function testExecuteAlreadyConfigured(): void
     {
         $this->googleClient
             ->shouldReceive('initialize')
@@ -45,7 +45,7 @@ class ConfigureSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString('already configured', $tester->getDisplay());
     }
 
-    public function test_execute_alreadyConfigured_withForce(): void
+    public function testExecuteAlreadyConfiguredWithForce(): void
     {
         $this->googleClient
             ->shouldReceive('initialize')
@@ -70,7 +70,7 @@ class ConfigureSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString(self::AUTH_URL, $tester->getDisplay());
     }
 
-    public function test_execute_notConfigured_providesAuthCode(): void
+    public function testExecuteNotConfiguredProvidesAuthCode(): void
     {
         $this->googleClient
             ->shouldReceive('initialize')
@@ -96,7 +96,7 @@ class ConfigureSyncCommandTest extends MockeryTestCase
         self::assertStringContainsString(self::DOMAIN, $tester->getDisplay());
     }
 
-    public function test_execute_notConfigured_emptyAuthCode(): void
+    public function testExecuteNotConfiguredEmptyAuthCode(): void
     {
         $this->googleClient
             ->shouldReceive('initialize')

@@ -11,7 +11,7 @@ class ContactListAnalyzerTest extends MockeryTestCase
     /**
      * @dataProvider diffProvider
      */
-    public function test_diff(array $sourceEmails, array $destEmails, int $expectedAdds, int $expectedRemoves, bool $removeDuplicates = true): void
+    public function testDiff(array $sourceEmails, array $destEmails, int $expectedAdds, int $expectedRemoves, bool $removeDuplicates = true): void
     {
         $source = array_map(static function (string $email) {
             $c = new Contact();

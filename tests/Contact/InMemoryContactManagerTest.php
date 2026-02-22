@@ -7,7 +7,7 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 
 class InMemoryContactManagerTest extends MockeryTestCase
 {
-    public function test_getList(): void
+    public function testGetList(): void
     {
         $inMemoryContacts = [
             [
@@ -28,14 +28,14 @@ class InMemoryContactManagerTest extends MockeryTestCase
         self::assertCount(1, $list2);
     }
 
-    public function test_emptyInput(): void
+    public function testEmptyInput(): void
     {
         $target = new InMemoryContactManager([]);
 
         self::assertCount(0, $target->getContacts('any@list'));
     }
 
-    public function test_nonExistentList(): void
+    public function testNonExistentList(): void
     {
         $target = new InMemoryContactManager([
             ['email' => 'foo@bar', 'list' => 'list1@list'],
@@ -44,7 +44,7 @@ class InMemoryContactManagerTest extends MockeryTestCase
         self::assertCount(0, $target->getContacts('nonexistent@list'));
     }
 
-    public function test_caseInsensitiveListQuery(): void
+    public function testCaseInsensitiveListQuery(): void
     {
         $target = new InMemoryContactManager([
             ['email' => 'foo@bar', 'list' => 'LIST@DOMAIN'],

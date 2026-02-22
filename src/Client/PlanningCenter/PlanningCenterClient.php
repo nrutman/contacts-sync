@@ -8,8 +8,8 @@ use App\Contact\Contact;
 use Exception;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\HttpFoundation\Request;
 use function GuzzleHttp\Psr7\parse_query;
+use Symfony\Component\HttpFoundation\Request;
 
 class PlanningCenterClient implements ReadableListClientInterface
 {

@@ -29,21 +29,21 @@ class FileProviderTest extends TestCase
         }
     }
 
-    public function test_getContents_readsFile(): void
+    public function testGetContentsReadsFile(): void
     {
         $path = $this->createTempFile('hello world');
 
         self::assertEquals('hello world', $this->target->getContents($path));
     }
 
-    public function test_getContents_fileNotFound(): void
+    public function testGetContentsFileNotFound(): void
     {
         $this->expectException(FileNotFoundException::class);
 
         $this->target->getContents(sys_get_temp_dir().'/nonexistent_'.uniqid().'.txt');
     }
 
-    public function test_saveContents_writesFile(): void
+    public function testSaveContentsWritesFile(): void
     {
         $path = sys_get_temp_dir().'/fileprovider_test_'.uniqid().'.txt';
         $this->tempFiles[] = $path;
@@ -53,12 +53,14 @@ class FileProviderTest extends TestCase
         self::assertEquals('test content', file_get_contents($path));
     }
 
-    public function test_saveContents_failureThrowsException(): void
+    public function testSaveContentsFailureThrowsException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Failed to write file');
 
-        set_error_handler(static function () { return true; });
+        set_error_handler(static function () {
+            return true;
+        });
         try {
             $this->target->saveContents('/nonexistent_dir_'.uniqid().'/file.txt', 'content');
         } finally {

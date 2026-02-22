@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on: [push]
 
@@ -25,3 +25,23 @@ jobs:
 
     - name: Run test suite
       run: composer run-script test
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
+
+    - name: Copy parameters file
+      run: cp config/parameters.yml.dist config/parameters.yml
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Check code style
+      run: composer run-script cs

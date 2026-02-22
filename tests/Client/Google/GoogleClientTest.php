@@ -68,7 +68,7 @@ class GoogleClientTest extends MockeryTestCase
         );
     }
 
-    public function test_initialize(): void
+    public function testInitialize(): void
     {
         $this->setupInitializeExpectations();
 
@@ -84,7 +84,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->initialize();
     }
 
-    public function test_initialize_invalidToken(): void
+    public function testInitializeInvalidToken(): void
     {
         $this->setupInitializeExpectations();
 
@@ -103,7 +103,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->initialize();
     }
 
-    public function test_initialize_refreshToken(): void
+    public function testInitializeRefreshToken(): void
     {
         $this->setupInitializeExpectations([
             'isAccessTokenExpired' => true,
@@ -128,7 +128,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->initialize();
     }
 
-    public function test_initialize_invalidRefreshToken(): void
+    public function testInitializeInvalidRefreshToken(): void
     {
         $this->setupInitializeExpectations([
             'isAccessTokenExpired' => true,
@@ -149,7 +149,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->initialize();
     }
 
-    public function test_initialize_tokenFileNotFound(): void
+    public function testInitializeTokenFileNotFound(): void
     {
         $this->setupInitializeExpectations();
 
@@ -163,7 +163,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->initialize();
     }
 
-    public function test_getContacts(): void
+    public function testGetContacts(): void
     {
         $member = new Google_Service_Directory_Member();
         $member->setEmail(self::MEMBER_EMAIL);
@@ -189,7 +189,7 @@ class GoogleClientTest extends MockeryTestCase
         self::assertNull($contact->lastName);
     }
 
-    public function test_addContact(): void
+    public function testAddContact(): void
     {
         $contact = new Contact();
         $contact->email = self::MEMBER_EMAIL;
@@ -202,7 +202,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->addContact(self::GROUP_ID, $contact);
     }
 
-    public function test_removeContact(): void
+    public function testRemoveContact(): void
     {
         $contact = new Contact();
         $contact->email = self::MEMBER_EMAIL;
@@ -215,7 +215,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->removeContact(self::GROUP_ID, $contact);
     }
 
-    public function test_setAuthCode(): void
+    public function testSetAuthCode(): void
     {
         $this->client
             ->shouldReceive('fetchAccessTokenWithAuthCode')
@@ -235,7 +235,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->target->setAuthCode(self::AUTH_CODE);
     }
 
-    public function test_setAuthCode_throwsOnErrorResponse(): void
+    public function testSetAuthCodeThrowsOnErrorResponse(): void
     {
         $errorToken = ['error' => 'invalid_grant'];
 

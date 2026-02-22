@@ -21,7 +21,7 @@ class RefreshPlanningCenterListsCommandTest extends MockeryTestCase
         $this->planningCenterClient = m::mock(PlanningCenterClient::class);
     }
 
-    public function test_execute_refreshSingleList(): void
+    public function testExecuteRefreshSingleList(): void
     {
         $this->planningCenterClient
             ->shouldReceive('refreshList')
@@ -40,7 +40,7 @@ class RefreshPlanningCenterListsCommandTest extends MockeryTestCase
         self::assertStringContainsString(self::LIST_ONE, $tester->getDisplay());
     }
 
-    public function test_execute_refreshAllLists(): void
+    public function testExecuteRefreshAllLists(): void
     {
         $this->planningCenterClient
             ->shouldReceive('refreshList')
@@ -65,7 +65,7 @@ class RefreshPlanningCenterListsCommandTest extends MockeryTestCase
         self::assertStringContainsString(self::LIST_TWO, $tester->getDisplay());
     }
 
-    public function test_execute_unknownList(): void
+    public function testExecuteUnknownList(): void
     {
         $command = new RefreshPlanningCenterListsCommand(
             [self::LIST_ONE],

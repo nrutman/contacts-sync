@@ -4,8 +4,6 @@ namespace App\Tests\Client\PlanningCenter;
 
 use App\Client\PlanningCenter\PlanningCenterClient;
 use App\Client\WebClientFactory;
-use App\Client\WebClientFactoryInterface;
-use App\Contact\Contact;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
@@ -47,7 +45,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         );
     }
 
-    public function test_getContacts(): void
+    public function testGetContacts(): void
     {
         // fetch for the list
         $this->webHandler->append(
@@ -100,7 +98,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         self::assertCount(2, $this->webHistory);
     }
 
-    public function test_refreshList(): void
+    public function testRefreshList(): void
     {
         $this->webHandler->append(
             new Response(200, [], \GuzzleHttp\json_encode([
@@ -117,7 +115,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         self::assertCount(2, $this->webHistory);
     }
 
-    public function test_getContacts_withPagination(): void
+    public function testGetContactsWithPagination(): void
     {
         // fetch for the list
         $this->webHandler->append(
@@ -195,7 +193,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         self::assertCount(3, $this->webHistory);
     }
 
-    public function test_getContacts_skipsPersonWithoutEmail(): void
+    public function testGetContactsSkipsPersonWithoutEmail(): void
     {
         // fetch for the list
         $this->webHandler->append(
@@ -232,7 +230,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         self::assertCount(0, $result);
     }
 
-    public function test_getContacts_listNotFound(): void
+    public function testGetContactsListNotFound(): void
     {
         $this->webHandler->append(
             new Response(200, [], \GuzzleHttp\json_encode([
@@ -246,7 +244,7 @@ class PlanningCenterClientTest extends MockeryTestCase
         $this->target->getContacts(self::LIST_NAME);
     }
 
-    public function test_refreshList_listNotFound(): void
+    public function testRefreshListListNotFound(): void
     {
         $this->webHandler->append(
             new Response(200, [], \GuzzleHttp\json_encode([
