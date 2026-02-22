@@ -38,17 +38,38 @@ class RunSyncCommandTest extends MockeryTestCase
         $sourceContact = $this->makeContact('source@test.com', 'John', 'Doe');
         $destContact = $this->makeContact('old@test.com');
 
-        $this->googleClient->shouldReceive('initialize')->once()->andReturn($this->googleClient);
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$sourceContact]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$destContact]);
-        $this->googleClient->shouldReceive('removeContact')->once()->with(self::LIST_ONE, $destContact);
-        $this->googleClient->shouldReceive('addContact')->once()->with(self::LIST_ONE, $sourceContact);
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andReturn($this->googleClient);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$sourceContact]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$destContact]);
+        $this->googleClient
+            ->shouldReceive('removeContact')
+            ->once()
+            ->with(self::LIST_ONE, $destContact);
+        $this->googleClient
+            ->shouldReceive('addContact')
+            ->once()
+            ->with(self::LIST_ONE, $sourceContact);
 
         $tester = $this->executeSyncCommand([self::LIST_ONE]);
 
         self::assertEquals(0, $tester->getStatusCode());
-        self::assertStringContainsString('source@test.com', $tester->getDisplay());
+        self::assertStringContainsString(
+            'source@test.com',
+            $tester->getDisplay(),
+        );
         self::assertStringContainsString('old@test.com', $tester->getDisplay());
     }
 
@@ -57,14 +78,29 @@ class RunSyncCommandTest extends MockeryTestCase
         $sourceContact = $this->makeContact('source@test.com');
         $destContact = $this->makeContact('old@test.com');
 
-        $this->googleClient->shouldReceive('initialize')->once()->andReturn($this->googleClient);
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$sourceContact]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$destContact]);
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andReturn($this->googleClient);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$sourceContact]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$destContact]);
         $this->googleClient->shouldNotReceive('removeContact');
         $this->googleClient->shouldNotReceive('addContact');
 
-        $tester = $this->executeSyncCommand([self::LIST_ONE], ['--dry-run' => true]);
+        $tester = $this->executeSyncCommand(
+            [self::LIST_ONE],
+            ['--dry-run' => true],
+        );
 
         self::assertEquals(0, $tester->getStatusCode());
         self::assertStringContainsString('dry run', $tester->getDisplay());
@@ -72,12 +108,18 @@ class RunSyncCommandTest extends MockeryTestCase
 
     public function testExecuteGoogleNotConfigured(): void
     {
-        $this->googleClient->shouldReceive('initialize')->once()->andThrow(new FileNotFoundException());
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andThrow(new FileNotFoundException());
 
         $tester = $this->executeSyncCommand([self::LIST_ONE]);
 
         self::assertEquals(1, $tester->getStatusCode());
-        self::assertStringContainsString('cannot authenticate', $tester->getDisplay());
+        self::assertStringContainsString(
+            'cannot authenticate',
+            $tester->getDisplay(),
+        );
     }
 
     public function testExecuteMultipleLists(): void
@@ -85,15 +127,36 @@ class RunSyncCommandTest extends MockeryTestCase
         $contact1 = $this->makeContact('a@test.com');
         $contact2 = $this->makeContact('b@test.com');
 
-        $this->googleClient->shouldReceive('initialize')->once()->andReturn($this->googleClient);
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andReturn($this->googleClient);
 
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$contact1]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$contact1]);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$contact1]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$contact1]);
 
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_TWO)->andReturn([$contact2]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_TWO)->andReturn([]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_TWO)->andReturn([$contact2]);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_TWO)
+            ->andReturn([$contact2]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_TWO)
+            ->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_TWO)
+            ->andReturn([$contact2]);
 
         $tester = $this->executeSyncCommand([self::LIST_ONE, self::LIST_TWO]);
 
@@ -107,10 +170,22 @@ class RunSyncCommandTest extends MockeryTestCase
         $pcContact = $this->makeContact('pc@test.com');
         $memContact = $this->makeContact('mem@test.com');
 
-        $this->googleClient->shouldReceive('initialize')->once()->andReturn($this->googleClient);
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$pcContact]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$memContact]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andReturn($this->googleClient);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$pcContact]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$memContact]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([]);
         $this->googleClient->shouldReceive('addContact')->twice();
 
         $tester = $this->executeSyncCommand([self::LIST_ONE]);
@@ -125,10 +200,22 @@ class RunSyncCommandTest extends MockeryTestCase
         $pcContact = $this->makeContact('same@test.com');
         $memContact = $this->makeContact('same@test.com');
 
-        $this->googleClient->shouldReceive('initialize')->once()->andReturn($this->googleClient);
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$pcContact]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$memContact]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andReturn($this->googleClient);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$pcContact]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$memContact]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([]);
         $this->googleClient->shouldReceive('addContact')->once();
 
         $tester = $this->executeSyncCommand([self::LIST_ONE]);
@@ -141,10 +228,22 @@ class RunSyncCommandTest extends MockeryTestCase
         $contact = $this->makeContact('shared@test.com');
         $destContact = $this->makeContact('shared@test.com');
 
-        $this->googleClient->shouldReceive('initialize')->once()->andReturn($this->googleClient);
-        $this->planningCenterClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$contact]);
-        $this->inMemoryContactManager->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([]);
-        $this->googleClient->shouldReceive('getContacts')->with(self::LIST_ONE)->andReturn([$destContact]);
+        $this->googleClient
+            ->shouldReceive('initialize')
+            ->once()
+            ->andReturn($this->googleClient);
+        $this->planningCenterClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$contact]);
+        $this->inMemoryContactManager
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([]);
+        $this->googleClient
+            ->shouldReceive('getContacts')
+            ->with(self::LIST_ONE)
+            ->andReturn([$destContact]);
         $this->googleClient->shouldNotReceive('addContact');
         $this->googleClient->shouldNotReceive('removeContact');
 
@@ -153,13 +252,15 @@ class RunSyncCommandTest extends MockeryTestCase
         self::assertEquals(0, $tester->getStatusCode());
     }
 
-    private function executeSyncCommand(array $lists, array $options = []): CommandTester
-    {
+    private function executeSyncCommand(
+        array $lists,
+        array $options = [],
+    ): CommandTester {
         $command = new RunSyncCommand(
             $lists,
             $this->googleClient,
             $this->planningCenterClient,
-            $this->inMemoryContactManager
+            $this->inMemoryContactManager,
         );
 
         $tester = new CommandTester($command);
@@ -168,8 +269,11 @@ class RunSyncCommandTest extends MockeryTestCase
         return $tester;
     }
 
-    private function makeContact(string $email, string $firstName = null, string $lastName = null): Contact
-    {
+    private function makeContact(
+        string $email,
+        ?string $firstName = null,
+        ?string $lastName = null,
+    ): Contact {
         $contact = new Contact();
         $contact->email = $email;
         $contact->firstName = $firstName;

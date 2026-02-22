@@ -1,0 +1,11 @@
+{
+    "$schema": "/phpactor.schema.json",
+    "language_server_php_cs_fixer.enabled": false,
+    "symfony.enabled": false,
+    "indexer.exclude_patterns": [
+        "/vendor/**/Tests/**/*",
+        "/vendor/**/tests/**/*",
+        "/var/cache/**/*",
+        "/vendor/composer/**/*"
+    ]
+}

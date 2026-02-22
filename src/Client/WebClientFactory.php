@@ -7,15 +7,11 @@ use GuzzleHttp\ClientInterface;
 
 class WebClientFactory implements WebClientFactoryInterface
 {
-    /** @var array */
-    protected $defaultConfiguration = [];
-
     /**
      * @param array $defaultConfiguration default configuration for creating Guzzle clients
      */
-    public function __construct(array $defaultConfiguration = [])
+    public function __construct(protected array $defaultConfiguration = [])
     {
-        $this->defaultConfiguration = $defaultConfiguration;
     }
 
     /**
@@ -27,6 +23,8 @@ class WebClientFactory implements WebClientFactoryInterface
      */
     public function create(array $guzzleConfiguration = []): ClientInterface
     {
-        return new Client(array_merge($guzzleConfiguration, $this->defaultConfiguration));
+        return new Client(
+            array_merge($guzzleConfiguration, $this->defaultConfiguration),
+        );
     }
 }
