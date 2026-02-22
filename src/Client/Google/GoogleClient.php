@@ -25,6 +25,9 @@ class GoogleClient implements
     protected Directory $service;
     protected string $varPath;
 
+    /**
+     * @param array<string, mixed> $googleConfiguration
+     */
     public function __construct(
         Client $client,
         GoogleServiceFactory $googleServiceFactory,
