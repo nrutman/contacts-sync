@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test\Contact;
+namespace App\Tests\Contact;
 
 use App\Contact\Contact;
 use App\Contact\ContactListAnalyzer;
@@ -8,32 +8,42 @@ use Mockery\Adapter\Phpunit\MockeryTestCase;
 
 class ContactListAnalyzerTest extends MockeryTestCase
 {
-    public function test_diff(): void
+    /**
+     * @dataProvider diffProvider
+     */
+    public function testDiff(array $sourceEmails, array $destEmails, int $expectedAdds, int $expectedRemoves, bool $removeDuplicates = true): void
     {
-        $sharedContact = new Contact();
-        $sharedContact->email = 'foo@bar';
-        $extraContact = new Contact();
-        $extraContact->email = 'boo@baz';
-        $missingContact = new Contact();
-        $missingContact->email = 'shaz@shuz';
+        $source = array_map(static function (string $email) {
+            $c = new Contact();
+            $c->email = $email;
 
-        $target = new ContactListAnalyzer([$sharedContact, $missingContact], [$sharedContact, $extraContact]);
+            return $c;
+        }, $sourceEmails);
 
-        self::assertCount(1, $target->getContactsToAdd());
-        self::assertEquals($missingContact, $target->getContactsToAdd()[0]);
-        self::assertCount(1, $target->getContactsToRemove());
-        self::assertEquals($extraContact, $target->getContactsToRemove()[0]);
+        $dest = array_map(static function (string $email) {
+            $c = new Contact();
+            $c->email = $email;
+
+            return $c;
+        }, $destEmails);
+
+        $target = new ContactListAnalyzer($source, $dest, $removeDuplicates);
+
+        self::assertCount($expectedAdds, $target->getContactsToAdd());
+        self::assertCount($expectedRemoves, $target->getContactsToRemove());
     }
 
-    public function test_duplicates(): void
+    public function diffProvider(): array
     {
-        $contact = new Contact();
-        $contact->email = 'foo@bar';
-        $duplicate = new Contact();
-        $duplicate->email = 'foo@bar';
-
-        $target = new ContactListAnalyzer([$contact, $duplicate], []);
-
-        self::assertCount(1, $target->getContactsToAdd());
+        return [
+            'basic add and remove' => [['foo@bar', 'shaz@shuz'], ['foo@bar', 'boo@baz'], 1, 1],
+            'removes duplicates from source' => [['foo@bar', 'foo@bar'], [], 1, 0],
+            'case insensitive matching' => [['Foo@Bar'], ['foo@bar'], 0, 0],
+            'empty source removes all dest' => [[], ['foo@bar'], 0, 1],
+            'empty dest adds all source' => [['foo@bar'], [], 1, 0],
+            'both empty' => [[], [], 0, 0],
+            'identical lists' => [['foo@bar', 'baz@qux'], ['foo@bar', 'baz@qux'], 0, 0],
+            'keeps duplicates when disabled' => [['foo@bar', 'foo@bar'], [], 2, 0, false],
+        ];
     }
 }

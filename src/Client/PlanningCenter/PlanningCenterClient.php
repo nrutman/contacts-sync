@@ -8,8 +8,8 @@ use App\Contact\Contact;
 use Exception;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\HttpFoundation\Request;
 use function GuzzleHttp\Psr7\parse_query;
+use Symfony\Component\HttpFoundation\Request;
 
 class PlanningCenterClient implements ReadableListClientInterface
 {
@@ -34,10 +34,10 @@ class PlanningCenterClient implements ReadableListClientInterface
      * {@inheritdoc}
      *
      * @throws GuzzleException
+     * @throws Exception
      */
     public function getContacts(string $listName): array
     {
-        // TODO Throw exception if the list can't be found (add @throws to interface)
         $response = $this->webClient->request('GET', '/people/v2/lists', [
             'query' => [
                 'where[name]' => $listName,
@@ -48,6 +48,10 @@ class PlanningCenterClient implements ReadableListClientInterface
         $list = array_filter($lists['data'], static function ($list) use ($listName) {
             return preg_match(sprintf('/^%s$/i', $listName), $list['attributes']['name']);
         });
+
+        if (empty($list)) {
+            throw new Exception(sprintf('The list `%s` could not be found.', $listName));
+        }
 
         return $this->queryPeopleApi([
             'include' => 'emails',
