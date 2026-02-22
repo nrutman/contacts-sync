@@ -37,6 +37,9 @@ jobs:
       with:
         php-version: '7.4'
 
+    - name: Copy parameters file
+      run: cp config/parameters.yml.dist config/parameters.yml
+
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
