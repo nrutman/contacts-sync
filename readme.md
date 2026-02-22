@@ -40,8 +40,8 @@ composer install
 Included in the `config` folder is a `parameters.yml.dist` file. Complete the following steps:
 1. Copy this file and rename it `parameters.yml`.
 2. Fill in all of the tokens with configuration for Planning Center and Google.
-3. Make sure the `lists` parameter is completed with the lists to sync from Planning Center into G Suite.
-4. Run `bin/console sync:configure` to get a Google G Suite token.
+3. Make sure the `lists` parameter is completed with the lists to sync from Planning Center into Google Workspace.
+4. Run `bin/console sync:configure` to get a Google Workspace token.
 
 ### Configuration Reference
 
@@ -50,7 +50,7 @@ Included in the `config` folder is a `parameters.yml.dist` file. Complete the fo
 | `planning_center.app.id` | string | Planning Center API application ID |
 | `planning_center.app.secret` | string | Planning Center API application secret |
 | `google.authentication` | object | Google OAuth client configuration (client ID, secret, project ID, URIs) |
-| `google.domain` | string | The G Suite domain (e.g. `example.com`) |
+| `google.domain` | string | The Google Workspace domain (e.g. `example.com`) |
 | `lists` | string[] | List names to sync — each name must match both a Planning Center list and a Google Group email |
 | `contacts` | object | In-memory contacts to include in sync (see below) |
 
@@ -77,11 +77,11 @@ In-memory contacts are merged with Planning Center contacts before the diff is c
 ## Usage
 
 ### sync:configure
-To configure the command by provisioning a token with your Google G Suite user, run the following command:
+To configure the command by provisioning a token with your Google Workspace user, run the following command:
 ```bash
 bin/console sync:configure
 ```
-The command will provide a Google authentication URL which will require you to login with a G Suite Groups administrator and paste the provided the access token back to the command. If a valid token has already been provided, the command will exit gracefully.
+The command will provide a Google authentication URL which will require you to login with a Google Workspace Groups administrator and paste the provided access token back to the command. If a valid token has already been provided, the command will exit gracefully.
 
 | Parameter | Description |
 | --------- | ----------- |
@@ -119,7 +119,7 @@ bin/console planning-center:refresh all
 
 ### Prerequisites
 
-- PHP 7.1.3+
+- PHP 8.5+
 - [Composer](https://getcomposer.org/)
 
 ### Running Tests
@@ -131,7 +131,7 @@ composer run-script test
 Or directly via PHPUnit:
 
 ```bash
-php vendor/bin/simple-phpunit
+php vendor/bin/phpunit
 ```
 
 ### Code Style
@@ -157,7 +157,6 @@ src/
 │   └── PlanningCenter/  # Planning Center API integration
 ├── Command/             # Symfony console commands
 ├── Contact/             # Contact domain objects and diff logic
-├── Controller/          # Web controllers
 └── File/                # File I/O utilities
 tests/                   # PHPUnit tests (mirrors src/ structure)
 config/                  # Symfony configuration and parameters

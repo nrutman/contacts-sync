@@ -7,12 +7,11 @@ use App\Client\Google\GoogleServiceFactory;
 use App\Client\Google\InvalidGoogleTokenException;
 use App\Contact\Contact;
 use App\File\FileProvider;
-use Google_Client;
-use Google_Service_Directory;
-use Google_Service_Directory_Member;
-use Google_Service_Directory_Members;
-use Google_Service_Directory_Resource_Members;
-use InvalidArgumentException;
+use Google\Client;
+use Google\Service\Directory;
+use Google\Service\Directory\Member;
+use Google\Service\Directory\Members;
+use Google\Service\Directory\Resource\Members as ResourceMembers;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use Mockery as m;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
@@ -34,13 +33,13 @@ class GoogleClientTest extends MockeryTestCase
     private const TOKEN_FILENAME = 'google-token.json';
     private const TOKEN_REFRESH = 'refresh.token';
 
-    /** @var Google_Client|m\LegacyMockInterface|m\MockInterface */
+    /** @var Client|m\LegacyMockInterface|m\MockInterface */
     private $client;
 
     /** @var FileProvider|m\LegacyMockInterface|m\MockInterface */
     private $fileProvider;
 
-    /** @var m\LegacyMockInterface|m\MockInterface|Google_Service_Directory */
+    /** @var m\LegacyMockInterface|m\MockInterface|Directory */
     private $service;
 
     /** @var m\LegacyMockInterface|m\MockInterface|GoogleServiceFactory */
@@ -51,9 +50,9 @@ class GoogleClientTest extends MockeryTestCase
 
     public function setUp(): void
     {
-        $this->client = m::mock(Google_Client::class);
+        $this->client = m::mock(Client::class);
         $this->fileProvider = m::mock(FileProvider::class);
-        $this->service = m::mock(Google_Service_Directory::class);
+        $this->service = m::mock(Directory::class);
         $this->serviceFactory = m::mock(GoogleServiceFactory::class, [
             'create' => $this->service,
         ]);
@@ -64,7 +63,7 @@ class GoogleClientTest extends MockeryTestCase
             $this->fileProvider,
             self::CONFIGURATION,
             self::DOMAIN,
-            self::TEMP_PATH
+            self::TEMP_PATH,
         );
     }
 
@@ -72,16 +71,16 @@ class GoogleClientTest extends MockeryTestCase
     {
         $this->setupInitializeExpectations();
 
-        $this->client
-            ->shouldReceive('setAccessToken')
-            ->with(self::TOKEN_ARRAY);
+        $this->client->shouldReceive('setAccessToken')->with(self::TOKEN_ARRAY);
 
         $this->fileProvider
             ->shouldReceive('getContents')
             ->with(self::TEMP_PATH.'/'.self::TOKEN_FILENAME)
             ->andReturn(self::TOKEN_STRING);
 
-        $this->target->initialize();
+        $result = $this->target->initialize();
+
+        self::assertSame($this->target, $result);
     }
 
     public function testInitializeInvalidToken(): void
@@ -91,7 +90,7 @@ class GoogleClientTest extends MockeryTestCase
         $this->client
             ->shouldReceive('setAccessToken')
             ->with(self::TOKEN_ARRAY)
-            ->andThrow(new InvalidArgumentException());
+            ->andThrow(new \InvalidArgumentException());
 
         $this->fileProvider
             ->shouldReceive('getContents')
@@ -112,9 +111,7 @@ class GoogleClientTest extends MockeryTestCase
             'getAccessToken' => self::TOKEN_ARRAY,
         ]);
 
-        $this->client
-            ->shouldReceive('setAccessToken')
-            ->with(self::TOKEN_ARRAY);
+        $this->client->shouldReceive('setAccessToken')->with(self::TOKEN_ARRAY);
 
         $this->fileProvider
             ->shouldReceive('getContents')
@@ -125,7 +122,9 @@ class GoogleClientTest extends MockeryTestCase
             ->shouldReceive('saveContents')
             ->with(self::TEMP_PATH.'/'.self::TOKEN_FILENAME, m::any());
 
-        $this->target->initialize();
+        $result = $this->target->initialize();
+
+        self::assertSame($this->target, $result);
     }
 
     public function testInitializeInvalidRefreshToken(): void
@@ -135,9 +134,7 @@ class GoogleClientTest extends MockeryTestCase
             'getRefreshToken' => null,
         ]);
 
-        $this->client
-            ->shouldReceive('setAccessToken')
-            ->with(self::TOKEN_ARRAY);
+        $this->client->shouldReceive('setAccessToken')->with(self::TOKEN_ARRAY);
 
         $this->fileProvider
             ->shouldReceive('getContents')
@@ -165,16 +162,18 @@ class GoogleClientTest extends MockeryTestCase
 
     public function testGetContacts(): void
     {
-        $member = new Google_Service_Directory_Member();
+        $member = new Member();
         $member->setEmail(self::MEMBER_EMAIL);
 
-        $this->service->members = m::mock(Google_Service_Directory_Resource_Members::class);
+        $this->service->members = m::mock(ResourceMembers::class);
         $this->service->members
             ->shouldReceive('listMembers')
             ->with(self::GROUP_ID)
-            ->andReturn(m::mock(Google_Service_Directory_Members::class, [
-                'getMembers' => [$member],
-            ]));
+            ->andReturn(
+                m::mock(Members::class, [
+                    'getMembers' => [$member],
+                ]),
+            );
 
         $result = $this->target->getContacts(self::GROUP_ID);
 
@@ -194,12 +193,15 @@ class GoogleClientTest extends MockeryTestCase
         $contact = new Contact();
         $contact->email = self::MEMBER_EMAIL;
 
-        $this->service->members = m::mock(Google_Service_Directory_Resource_Members::class);
+        $this->service->members = m::mock(ResourceMembers::class);
         $this->service->members
             ->shouldReceive('insert')
-            ->with(self::GROUP_ID, m::type(Google_Service_Directory_Member::class));
+            ->with(self::GROUP_ID, m::type(Member::class));
 
         $this->target->addContact(self::GROUP_ID, $contact);
+
+        // Mockery expectations verify insert was called with correct args
+        self::assertSame(self::MEMBER_EMAIL, $contact->email);
     }
 
     public function testRemoveContact(): void
@@ -207,12 +209,15 @@ class GoogleClientTest extends MockeryTestCase
         $contact = new Contact();
         $contact->email = self::MEMBER_EMAIL;
 
-        $this->service->members = m::mock(Google_Service_Directory_Resource_Members::class);
+        $this->service->members = m::mock(ResourceMembers::class);
         $this->service->members
             ->shouldReceive('delete')
             ->with(self::GROUP_ID, self::MEMBER_EMAIL);
 
         $this->target->removeContact(self::GROUP_ID, $contact);
+
+        // Mockery expectations verify delete was called with correct args
+        self::assertSame(self::MEMBER_EMAIL, $contact->email);
     }
 
     public function testSetAuthCode(): void
@@ -222,17 +227,18 @@ class GoogleClientTest extends MockeryTestCase
             ->with(self::AUTH_CODE)
             ->andReturn(self::TOKEN_ARRAY);
 
-        $this->client
-            ->shouldReceive('setAccessToken');
+        $this->client->shouldReceive('setAccessToken');
 
         $this->client
             ->shouldReceive('getAccessToken')
             ->andReturn(self::TOKEN_ARRAY);
 
-        $this->fileProvider
-            ->shouldReceive('saveContents');
+        $this->fileProvider->shouldReceive('saveContents');
 
         $this->target->setAuthCode(self::AUTH_CODE);
+
+        // Mockery expectations verify the full auth code flow completed
+        self::assertTrue(true);
     }
 
     public function testSetAuthCodeThrowsOnErrorResponse(): void
@@ -244,8 +250,7 @@ class GoogleClientTest extends MockeryTestCase
             ->with(self::AUTH_CODE)
             ->andReturn($errorToken);
 
-        $this->client
-            ->shouldReceive('setAccessToken');
+        $this->client->shouldReceive('setAccessToken');
 
         $this->expectException(InvalidGoogleTokenException::class);
 

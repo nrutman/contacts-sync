@@ -1,14 +1,9 @@
-
 # Application files and folders
 /config/parameters.yml
 /tmp
 
 # Composer dependencies
 /vendor
-
-# Utility caches
-.phpunit.result.cache
-.php_cs.cache
 
 # Editor settings
 /.idea
@@ -22,13 +17,21 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-###> symfony/phpunit-bridge ###
-.phpunit
-.phpunit.result.cache
+# Symfony Flex auto-generated files
+/config/reference.php
+/config/preload.php
+
+###> phpunit/phpunit ###
 /phpunit.xml
-###< symfony/phpunit-bridge ###
+/.phpunit.cache/
+.phpunit.result.cache
+###< phpunit/phpunit ###
 
 ###> friendsofphp/php-cs-fixer ###
-/.php_cs
-/.php_cs.cache
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
+
+###> symfony/runtime ###
+/.env.local
+###< symfony/runtime ###

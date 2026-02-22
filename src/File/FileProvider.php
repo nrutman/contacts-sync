@@ -2,7 +2,6 @@
 
 namespace App\File;
 
-use RuntimeException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class FileProvider
@@ -24,12 +23,12 @@ class FileProvider
     /**
      * Writes the contents of the specified file.
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     public function saveContents(string $filePath, string $content): void
     {
         if (file_put_contents($filePath, $content) === false) {
-            throw new RuntimeException(sprintf('Failed to write file (%s)', $filePath));
+            throw new \RuntimeException(sprintf('Failed to write file (%s)', $filePath));
         }
     }
 }

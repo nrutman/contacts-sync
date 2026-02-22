@@ -4,7 +4,6 @@ namespace App\Tests\File;
 
 use App\File\FileProvider;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class FileProviderTest extends TestCase
@@ -55,7 +54,7 @@ class FileProviderTest extends TestCase
 
     public function testSaveContentsFailureThrowsException(): void
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Failed to write file');
 
         set_error_handler(static function () {

@@ -4,12 +4,9 @@ namespace App\Contact;
 
 class Contact
 {
-    /** @var string */
-    public $firstName;
+    public ?string $firstName = null;
 
-    /** @var string */
-    public $lastName;
+    public ?string $lastName = null;
 
-    /** @var string|null */
-    public $email;
+    public ?string $email = null;
 }

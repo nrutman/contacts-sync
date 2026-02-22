@@ -4,13 +4,15 @@ namespace App\Contact;
 
 class InMemoryContactManager
 {
-    /** @var array */
-    private $contactsByList = [];
+    /** @var array<string, Contact[]> */
+    private array $contactsByList = [];
 
     public function __construct(array $inMemoryContacts)
     {
         foreach ($inMemoryContacts as $contact) {
-            $lists = is_array($contact['list']) ? $contact['list'] : [$contact['list']];
+            $lists = is_array($contact['list'])
+                ? $contact['list']
+                : [$contact['list']];
 
             foreach ($lists as $list) {
                 $list = strtolower($list);

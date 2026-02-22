@@ -2,13 +2,13 @@
 
 namespace App\Client\Google;
 
-use Google_Client;
-use Google_Service_Directory;
+use Google\Client;
+use Google\Service\Directory;
 
 class GoogleServiceFactory
 {
-    public function create(Google_Client $client): Google_Service_Directory
+    public function create(Client $client): Directory
     {
-        return new Google_Service_Directory($client);
+        return new Directory($client);
     }
 }
